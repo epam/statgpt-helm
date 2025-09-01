@@ -1,0 +1,81 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+## Prerequisites
+
+- Helm 3.8.0+
+- PV provisioner support in the underlying infrastructure (optional)
+- Ingress controller support in the underlying infrastructure (optional)
+
+{{ template "chart.requirementsSection" . }}
+
+## Validating the Chart
+
+You can preview the generated manifests before installation.
+
+Example for the chart with the release name `my-release` and namespace `my-namespace`:
+
+```console
+helm template my-release . --namespace my-namespace --values values.yaml
+```
+
+With environment-specific values:
+
+```console
+helm template my-release . --namespace my-namespace --values values.yaml --values envs/statgpt/dev/values.yaml
+```
+
+## Installing the Chart
+
+First, update dependencies:
+
+```console
+helm dependency update
+```
+
+To install the chart with the release name `my-release` into namespace `my-namespace`:
+
+```console
+helm install my-release . --namespace my-namespace --values values.yaml
+```
+
+## Using Environment-Specific Values
+
+If you have environment-specific configuration files, you can merge them with the base values.
+
+Example for development environment:
+
+```console
+helm install my-release . --namespace my-namespace --values values.yaml --values envs/statgpt/dev/values.yaml
+```
+
+Example for production environment:
+
+```console
+helm install my-release . --namespace my-namespace --values values.yaml --values envs/statgpt/prod/values.yaml
+```
+
+## Uninstalling the Chart
+
+To uninstall/delete the `my-release` deployment from namespace `my-namespace`:
+
+```console
+helm delete my-release --namespace my-namespace
+```
+
+The command removes all the Kubernetes components associated with the chart and deletes the release.
+
+**NOTE**: Persistent Volumes created by StatefulSets won't be deleted automatically
+
+## Parameters
+
+Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
+
+```console
+helm install my-release . --namespace my-namespace --values values.yaml --set admin-frontend.image.tag=latest
+```
+
+{{ template "chart.valuesSection" . }}
