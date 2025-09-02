@@ -1,6 +1,5 @@
 # statgpt
 
-
 ![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution

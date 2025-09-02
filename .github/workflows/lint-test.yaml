@@ -47,83 +47,16 @@ jobs:
           CHANGED_CHARTS: ${{ steps.list-changed.outputs.changed }}
         run: |
           #!/bin/bash
-          set -e
-
-          echo "=== DEBUGGING HELM-DOCS CHECK ==="
-          echo "Changed charts: $CHANGED_CHARTS"
-          echo "Working directory: $(pwd)"
-          echo "Git status before helm-docs:"
-          git status --porcelain
-
           IFS=$'\n'
           for chart in $CHANGED_CHARTS; do
-            echo ""
-            echo "=== Processing chart: ${chart} ==="
-            echo "Chart directory contents:"
-            ls -la "${chart}/"
-
-            echo ""
-            echo "README.md before helm-docs (if exists):"
-            if [[ -f "${chart}/README.md" ]]; then
-              echo "File exists, size: $(wc -c < ${chart}/README.md) bytes"
-              echo "Line endings check:"
-              file "${chart}/README.md"
-              echo "Last few lines:"
-              tail -3 "${chart}/README.md" | cat -A
-            else
-              echo "README.md does not exist"
-            fi
-
-            echo ""
-            echo "Running helm-docs for ${chart}..."
             docker run --rm --volume "$(pwd):/helm-docs" -u "$(id -u)" jnorwood/helm-docs:${HELM_DOCS_VERSION} --chart-search-root=${chart}
-
-            echo ""
-            echo "README.md after helm-docs:"
-            if [[ -f "${chart}/README.md" ]]; then
-              echo "File exists, size: $(wc -c < ${chart}/README.md) bytes"
-              echo "Line endings check:"
-              file "${chart}/README.md"
-              echo "Last few lines:"
-              tail -3 "${chart}/README.md" | cat -A
-            else
-              echo "README.md still does not exist!"
-            fi
-
-            echo ""
-            echo "Git status after helm-docs for ${chart}:"
-            git status --porcelain "${chart}/README.md"
-
-            echo ""
-            echo "Git diff for ${chart}/README.md:"
-            if git diff --quiet "${chart}/README.md"; then
-              echo "No differences detected by git diff"
-            else
-              echo "Differences found:"
-              git diff "${chart}/README.md" | head -20
-              echo ""
-              echo "Detailed diff with whitespace visible:"
-              git diff --ws-error-highlight=all "${chart}/README.md" | head -20
-            fi
-
-            echo ""
-            echo "Checking git status porcelain output:"
-            porcelain_output=$(git status --porcelain "${chart}/README.md")
-            echo "Porcelain output: '${porcelain_output}'"
-            echo "Length of porcelain output: ${#porcelain_output}"
-
-            if [[ -n "$porcelain_output" ]]; then
+            if [[ $(git status --porcelain ${chart}/README.md) ]]; then
               echo "::error::Documentation for ${chart} is not up-to-date. Please run \`helm-docs\` and commit changes!"
-              echo "::error::Git detected changes in the README.md file"
               exit 1
             else
-              echo "✅ Documentation for ${chart} is up-to-date."
+              echo "Documentation for ${chart} is up-to-date."
             fi
           done
-
-          echo ""
-          echo "=== FINAL GIT STATUS ==="
-          git status --porcelain
 
       - name: Run chart-testing (lint)
         if: steps.list-changed.outputs.is_changed == 'true'
