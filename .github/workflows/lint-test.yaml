@@ -44,15 +44,19 @@ jobs:
         if: steps.list-changed.outputs.is_changed == 'true'
         env:
           HELM_DOCS_VERSION: v1.11.3
+          CHANGED_CHARTS: ${{ steps.list-changed.outputs.changed }}
         run: |
           #!/bin/bash
-          docker run --rm --volume "$(pwd):/helm-docs" -u "$(id -u)" jnorwood/helm-docs:${HELM_DOCS_VERSION}
-          if [[ $(git status --porcelain README.md) ]]; then
-            echo "::error::Documentation is not up-to-date. Please run \`helm-docs\` and commit changes!"
-            exit 1
-          else
-            echo "Documentation is up-to-date."
-          fi
+          IFS=$'\n'
+          for chart in $CHANGED_CHARTS; do
+            docker run --rm --volume "$(pwd):/helm-docs" -u "$(id -u)" jnorwood/helm-docs:${HELM_DOCS_VERSION} --chart-search-root=${chart}
+            if [[ $(git status --porcelain ${chart}/README.md) ]]; then
+              echo "::error::Documentation for ${chart} is not up-to-date. Please run \`helm-docs\` and commit changes!"
+              exit 1
+            else
+              echo "Documentation for ${chart} is up-to-date."
+            fi
+          done
 
       - name: Run chart-testing (lint)
         if: steps.list-changed.outputs.is_changed == 'true'

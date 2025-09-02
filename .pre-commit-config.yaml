@@ -5,8 +5,8 @@ repos:
       - id: check-yaml
         exclude: |
           (?x)^(
-            templates/.*\.yaml$|
-            templates/.*\.yml$
+            charts/statgpt/templates/.*\.yaml$|
+            charts/statgpt/templates/.*\.yml$
           )
       - id: end-of-file-fixer
       - id: trailing-whitespace
