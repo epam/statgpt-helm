@@ -25,6 +25,3 @@
 OWNERS
 README.md.gotmpl
 ci/
-# Files related to the current project
-.github/
-.pre-commit-config.yaml
