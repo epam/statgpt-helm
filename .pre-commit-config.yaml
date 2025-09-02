@@ -9,8 +9,5 @@ repos:
             charts/statgpt/templates/.*\.yml$
           )
       - id: end-of-file-fixer
-        exclude: charts/statgpt/README.md
       - id: trailing-whitespace
-        exclude: charts/statgpt/README.md
       - id: mixed-line-ending
-        exclude: charts/statgpt/README.md
