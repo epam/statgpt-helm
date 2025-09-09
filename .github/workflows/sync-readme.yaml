@@ -3,19 +3,16 @@ name: Sync README to gh-pages
 on:
   push:
     branches:
-      - 'main'
+      - "main"
     paths:
-      - 'README.md'
-
-permissions:
-  contents: write
+      - "README.md"
 
 jobs:
   sync-readme:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           ref: main
 
@@ -24,16 +21,16 @@ jobs:
           cp -f README.md ${{ runner.temp }}/README.md
 
       - name: Checkout gh-pages
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           ref: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
 
       - name: Update README and commit
         run: |
           cp -f ${{ runner.temp }}/README.md .
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "statgpt-actions"
+          git config user.email "231008922+statgpt-actions@users.noreply.github.com"
           git add README.md
           git diff --quiet && git diff --staged --quiet || git commit --signoff -m "Sync README.md from main branch"
           git push
