@@ -24,11 +24,6 @@ dependencies:
     repository: https://charts.epam-rail.com
     alias: admin-frontend
     condition: admin-frontend.enabled
-  - name: dial-extension
-    version: 1.3.2
-    repository: https://charts.epam-rail.com
-    alias: dial-ag-grid-visualizer
-    condition: dial-ag-grid-visualizer.enabled
   - name: postgresql
     version: 15.5.5
     repository: https://charts.bitnami.com/bitnami

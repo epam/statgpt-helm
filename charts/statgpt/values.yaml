@@ -1,7 +1,6 @@
 # -- Backend version used for both chat-backend and admin-backend image tags (must be the same for both)
 _backend_version: &backend_version "0.1.0"
 _admin_frontend_version: &admin_frontend_version "0.1.0"
-_dial_ag_grid_visualizer_version: &dial_ag_grid_visualizer_version "0.1.0"
 _pgvector_version: &pgvector_version "16.3.0-debian-12-r14"
 _elasticsearch_version: &elasticsearch_version "8.14.3-debian-12-r0"
 
@@ -335,73 +334,6 @@ admin-frontend:
     # NEXTAUTH_SECRET: ""
     # AUTH_KEYCLOAK_SECRET: "" # Keycloak Identity Provider
     # AUTH_AZURE_AD_SECRET: "" # Azure Identity Provider
-
-  ### Ingress Configuration ###
-  # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
-  ingress:
-    # -- Enable Ingress resource
-    enabled: false
-    # -- Specify the Ingress class name
-    ingressClassName: "nginx"
-    # -- Path for the Ingress resource
-    path: "/"
-    # -- NGINX annotations for proxy configuration
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-
-dial-ag-grid-visualizer:
-  # -- Indicates whether the dial-ag-grid-visualizer service is enabled
-  enabled: false
-
-  commonLabels:
-    # -- Kubernetes label to identify the component as an application
-    app.kubernetes.io/component: "application"
-
-  ### Container Image Configuration ###
-  # ref: https://kubernetes.io/docs/concepts/containers/images/
-  image:
-    # -- Docker registry URL
-    registry: docker.io
-    # -- Image repository name
-    repository: epam/statgpt-dial-ag-grid-visualizer
-    # -- Image tag or version
-    tag: *dial_ag_grid_visualizer_version
-    # -- Image pull policy
-    pullPolicy: Always
-
-  ### Container Port Configuration ###
-  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
-  containerPorts:
-    # -- HTTP port for the application
-    http: 3000
-
-  ### Resource Management ###
-  # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-  resources:
-    limits:
-      # -- Maximum CPU limit for the container
-      cpu: "1000m"
-      # -- Maximum memory limit for the container
-      memory: "1Gi"
-    requests:
-      # -- Minimum CPU request for resource scheduling
-      cpu: "100m"
-      # -- Minimum memory request for resource scheduling
-      memory: "0.125Gi"
-
-  metrics:
-    # -- Enable metrics collection
-    enabled: false
-    serviceMonitor:
-      # -- Enable Prometheus ServiceMonitor for metrics
-      enabled: false
-
-  ### Environment Variables ###
-  env:
-    # -- URL for DIAL application
-    DIAL_URL: "environment-specific"
 
   ### Ingress Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/

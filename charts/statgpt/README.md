@@ -22,7 +22,6 @@ Kubernetes: `>=1.23.0-0`
 | https://charts.epam-rail.com | chat-backend(dial-extension) | 1.3.2 |
 | https://charts.epam-rail.com | admin-backend(dial-extension) | 1.3.2 |
 | https://charts.epam-rail.com | admin-frontend(dial-extension) | 1.3.2 |
-| https://charts.epam-rail.com | dial-ag-grid-visualizer(dial-extension) | 1.3.2 |
 | https://charts.epam-rail.com | portal-frontend(dial-extension) | 1.3.2 |
 
 ## Validating the Chart
@@ -97,7 +96,6 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 |-----|------|---------|-------------|
 | _admin_frontend_version | string | `"0.1.0"` |  |
 | _backend_version | string | `"0.1.0"` | Backend version used for both chat-backend and admin-backend image tags (must be the same for both) |
-| _dial_ag_grid_visualizer_version | string | `"0.1.0"` |  |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` |  |
 | _pgvector_version | string | `"16.3.0-debian-12-r14"` |  |
 | admin-backend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
@@ -203,24 +201,6 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | chat-backend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
 | chat-backend.resources.requests.memory | string | `"2Gi"` | Minimum memory request for resource scheduling |
-| dial-ag-grid-visualizer.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
-| dial-ag-grid-visualizer.containerPorts.http | int | `3000` | HTTP port for the application |
-| dial-ag-grid-visualizer.enabled | bool | `false` | Indicates whether the dial-ag-grid-visualizer service is enabled |
-| dial-ag-grid-visualizer.env.DIAL_URL | string | `"environment-specific"` | URL for DIAL application |
-| dial-ag-grid-visualizer.image.pullPolicy | string | `"Always"` | Image pull policy |
-| dial-ag-grid-visualizer.image.registry | string | `"docker.io"` | Docker registry URL |
-| dial-ag-grid-visualizer.image.repository | string | `"epam/statgpt-dial-ag-grid-visualizer"` | Image repository name |
-| dial-ag-grid-visualizer.image.tag | string | `"0.1.0"` | Image tag or version |
-| dial-ag-grid-visualizer.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
-| dial-ag-grid-visualizer.ingress.enabled | bool | `false` | Enable Ingress resource |
-| dial-ag-grid-visualizer.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
-| dial-ag-grid-visualizer.ingress.path | string | `"/"` | Path for the Ingress resource |
-| dial-ag-grid-visualizer.metrics.enabled | bool | `false` | Enable metrics collection |
-| dial-ag-grid-visualizer.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
-| dial-ag-grid-visualizer.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
-| dial-ag-grid-visualizer.resources.limits.memory | string | `"1Gi"` | Maximum memory limit for the container |
-| dial-ag-grid-visualizer.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
-| dial-ag-grid-visualizer.resources.requests.memory | string | `"0.125Gi"` | Minimum memory request for resource scheduling |
 | elasticsearch.coordinating.replicaCount | int | `0` | Number of coordinating node replicas |
 | elasticsearch.data.replicaCount | int | `0` | Number of data node replicas |
 | elasticsearch.enabled | bool | `false` | Indicates whether the elasticsearch service is enabled |
