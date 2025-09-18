@@ -1,6 +1,6 @@
-# StatGPT Generic Installation Simple Guide
+# StatGPT Generic Installation Guide
 
-- [StatGPT Generic Installation Simple Guide](#statgpt-generic-installation-simple-guide)
+- [StatGPT Generic Installation Guide](#statgpt-generic-installation-guide)
   - [Prerequisites](#prerequisites)
   - [Expected Outcome](#expected-outcome)
   - [Install](#install)
@@ -58,19 +58,33 @@ Configuring authentication provider, encrypted secrets, model usage limits, Ingr
     ```
 
 1. Copy [values.yaml](values.yaml) file to your working directory and fill in missing values:
+
+    **Basic Configuration:**
     - Replace `%%NAMESPACE%%` with namespace created above, e.g. `statgpt`
     - Replace `%%RELEASE_NAME%%` with release name created above, e.g. `statgpt`
     - Replace `%%DOMAIN%%` with your domain name, e.g. `example.com`
+    - It's assumed you've configured **external-dns** and **cert-manager** beforehand, so replace `%%CLUSTER_ISSUER%%` with your cluster issuer name, e.g. `letsencrypt-production`
+
+    **Additional Resources Integration:**
     - Replace `%%DIAL_URL%%` with DIAL Core URL from [prerequisites](#prerequisites), e.g. `http://dial-core.dial.svc.cluster.local:80`
     - Replace `%%DIAL_API_KEY%%` with DIAL API Key value from [prerequisites](#prerequisites) (generated during DIAL configuration)
     - Replace `%%SDMX_PORTAL_URL%%` with SDMX Portal URL, e.g. `https://explorer.statgpt.dialx.ai/en/explorer`
+
+    **Authentication & Security:**
     - Replace `%%NEXTAUTH_SECRET%%` with generated value (`openssl rand -base64 64`)
+
+    **PostgreSQL Configuration:**
     - Replace `%%POSTGRES_ADMIN_PASSWORD%%` with generated value (`pwgen -s -1 32`)
     - Replace `%%POSTGRES_DB_USERNAME%%`, e.g. `statgpt`
     - Replace `%%POSTGRES_DB_PASSWORD%%` with generated value (`pwgen -s -1 32`)
+
+    **Elasticsearch Configuration:**
     - Replace `%%ELASTIC_USERNAME%%`, e.g. `statgpt`
     - Replace `%%ELASTIC_PASSWORD%%` with generated value (`pwgen -s -1 32`)
-    - It's assumed you've configured **external-dns** and **cert-manager** beforehand, so replace `%%CLUSTER_ISSUER%%` with your cluster issuer name, e.g. `letsencrypt-production`
+
+    > **Security Note:** Store all generated passwords securely. This basic configuration stores secrets as plain text in Kubernetes, which is **not recommended for production use**.
+
+    > **Prerequisites:** Ensure you have configured **external-dns** and **cert-manager** before deployment for automatic DNS and TLS certificate management.
 
 1. Install `statgpt` helm chart in created namespace, applying custom values file:
 

@@ -38,7 +38,7 @@ admin-backend:
 admin-frontend:
   enabled: true
   env:
-    DIAL_URL: "%%DIAL_URL%%"
+    DIAL_API_URL: "%%DIAL_URL%%"
     API_URL: "http://%%RELEASE_NAME%%-admin-backend.%%NAMESPACE%%.svc.cluster.local:80/admin"
     NEXTAUTH_URL: "https://admin.%%DOMAIN%%/"
   secrets:
@@ -67,6 +67,7 @@ pgvector:
 elasticsearch:
   enabled: true
   security:
+    enabled: true
     elasticPassword: "%%ELASTIC_PASSWORD%%"
 
 portal-frontend:

@@ -1,0 +1,225 @@
+chat-backend:
+  enabled: true
+  podLabels:
+    azure.workload.identity/use: "true"
+  serviceAccount:
+    create: true
+    name: statgpt-chat-backend-sa
+    annotations:
+      azure.workload.identity/client-id: "%%CHAT_BACKEND_CLIENT_ID%%"
+  extraVolumes:
+    - name: chat-backend-secrets
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: chat-backend-secrets-spc
+  extraVolumeMounts:
+    - name: chat-backend-secrets
+      mountPath: /mnt/chat-backend-secrets-store
+  extraEnvVarsSecret: chat-backend-secrets
+  extraDeploy:
+    - apiVersion: secrets-store.csi.x-k8s.io/v1
+      kind: SecretProviderClass
+      metadata:
+        name: chat-backend-secrets-spc
+        namespace: "%%NAMESPACE%%"
+      spec:
+        provider: azure
+        parameters:
+          keyvaultName: "%%KEY_VAULT_NAME%%"
+          objects: |
+            array:
+              - |
+                objectName: %%DIAL_API_KEY_SECRET_NAME%%
+                objectType: secret
+              - |
+                objectName: %%ELASTIC_PASSWORD_SECRET_NAME%%
+                objectType: secret
+          tenantId: "%%TENANT_ID%%"
+          useVMManagedIdentity: "true"
+          userAssignedIdentityID: "%%USER_ASSIGNED_IDENTITY_ID%%"
+        secretObjects:
+          - data:
+              - key: "DIAL_API_KEY"
+                objectName: "%%DIAL_API_KEY_SECRET_NAME%%"
+              - key: "ELASTIC_AUTH_PASSWORD"
+                objectName: "%%ELASTIC_PASSWORD_SECRET_NAME%%"
+              - key: "elasticsearch-password"
+                objectName: "%%ELASTIC_PASSWORD_SECRET_NAME%%"
+            secretName: chat-backend-secrets
+            type: Opaque
+  env:
+    DIAL_URL: "%%DIAL_URL%%"
+    SDMX_PORTAL_URL: "%%SDMX_PORTAL_URL%%"
+    PGVECTOR_USE_MSI: "true"
+    PGVECTOR_HOST: "%%POSTGRES_HOST%%"
+    PGVECTOR_PORT: "5432"
+    PGVECTOR_DATABASE: "%%POSTGRES_DB_NAME%%"
+    PGVECTOR_USER: "%%POSTGRES_DB_USERNAME%%"
+    ELASTIC_CONNECTION_STRING: "http://%%RELEASE_NAME%%-elasticsearch.%%NAMESPACE%%.svc.cluster.local:9200"
+    ELASTIC_INDICATORS_INDEX: "statgpt-indicators"
+    ELASTIC_MATCHING_INDEX: "statgpt-matching"
+    ELASTIC_AUTH_USER: "%%ELASTIC_USERNAME%%"
+
+admin-backend:
+  enabled: true
+  podLabels:
+    azure.workload.identity/use: "true"
+  serviceAccount:
+    create: true
+    name: statgpt-admin-backend-sa
+    annotations:
+      azure.workload.identity/client-id: "%%ADMIN_BACKEND_CLIENT_ID%%"
+  extraVolumes:
+    - name: admin-backend-secrets
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: admin-backend-secrets-spc
+  extraVolumeMounts:
+    - name: admin-backend-secrets
+      mountPath: /mnt/admin-backend-secrets-store
+  extraEnvVarsSecret: admin-backend-secrets
+  extraDeploy:
+    - apiVersion: secrets-store.csi.x-k8s.io/v1
+      kind: SecretProviderClass
+      metadata:
+        name: admin-backend-secrets-spc
+        namespace: "%%NAMESPACE%%"
+      spec:
+        provider: azure
+        parameters:
+          keyvaultName: "%%KEY_VAULT_NAME%%"
+          objects: |
+            array:
+              - |
+                objectName: %%DIAL_API_KEY_SECRET_NAME%%
+                objectType: secret
+              - |
+                objectName: %%ELASTIC_PASSWORD_SECRET_NAME%%
+                objectType: secret
+          tenantId: "%%TENANT_ID%%"
+          useVMManagedIdentity: "true"
+          userAssignedIdentityID: "%%USER_ASSIGNED_IDENTITY_ID%%"
+        secretObjects:
+          - data:
+              - key: "DIAL_API_KEY"
+                objectName: "%%DIAL_API_KEY_SECRET_NAME%%"
+              - key: "ELASTIC_AUTH_PASSWORD"
+                objectName: "%%ELASTIC_PASSWORD_SECRET_NAME%%"
+            secretName: admin-backend-secrets
+            type: Opaque
+  env:
+    OIDC_AUTH_ENABLED: "false"
+    ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED: "false"
+    DIAL_URL: "%%DIAL_URL%%"
+    PGVECTOR_USE_MSI: "true"
+    PGVECTOR_HOST: "%%POSTGRES_HOST%%"
+    PGVECTOR_PORT: "5432"
+    PGVECTOR_DATABASE: "%%POSTGRES_DB_NAME%%"
+    PGVECTOR_USER: "%%POSTGRES_DB_USERNAME%%"
+    ELASTIC_CONNECTION_STRING: "http://%%RELEASE_NAME%%-elasticsearch.%%NAMESPACE%%.svc.cluster.local:9200"
+    ELASTIC_INDICATORS_INDEX: "statgpt-indicators"
+    ELASTIC_MATCHING_INDEX: "statgpt-matching"
+    ELASTIC_AUTH_USER: "%%ELASTIC_USERNAME%%"
+  initContainers:
+    - name: alembic
+      image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: IfNotPresent
+      command:
+        - sh
+        - '-c'
+        - >-
+          alembic -c $APP_HOME/alembic.ini upgrade head
+      env:
+        - name: "APP_HOME"
+          value: "/home/app"
+        - name: "PGVECTOR_HOST"
+          value: "%%POSTGRES_HOST%%"
+        - name: "PGVECTOR_PORT"
+          value: "5432"
+        - name: "PGVECTOR_DATABASE"
+          value: "%%POSTGRES_DB_NAME%%"
+        - name: "PGVECTOR_USER"
+          value: "%%POSTGRES_DB_USERNAME%%"
+        - name: "PGVECTOR_USE_MSI"
+          value: "true"
+
+admin-frontend:
+  enabled: true
+  podLabels:
+    azure.workload.identity/use: "true"
+  serviceAccount:
+    create: true
+    name: statgpt-admin-frontend-sa
+    annotations:
+      azure.workload.identity/client-id: "%%ADMIN_FRONTEND_CLIENT_ID%%"
+  extraVolumes:
+    - name: admin-frontend-secrets
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: admin-frontend-secrets-spc
+  extraVolumeMounts:
+    - name: admin-frontend-secrets
+      mountPath: /mnt/admin-frontend-secrets-store
+  extraEnvVarsSecret: admin-frontend-secrets
+  extraDeploy:
+    - apiVersion: secrets-store.csi.x-k8s.io/v1
+      kind: SecretProviderClass
+      metadata:
+        name: admin-frontend-secrets-spc
+        namespace: "%%NAMESPACE%%"
+      spec:
+        provider: azure
+        parameters:
+          keyvaultName: "%%KEY_VAULT_NAME%%"
+          objects: |
+            array:
+              - |
+                objectName: %%DIAL_API_KEY_SECRET_NAME%%
+                objectType: secret
+              - |
+                objectName: %%NEXTAUTH_SECRET_NAME%%
+                objectType: secret
+          tenantId: "%%TENANT_ID%%"
+          useVMManagedIdentity: "true"
+          userAssignedIdentityID: "%%USER_ASSIGNED_IDENTITY_ID%%"
+        secretObjects:
+          - data:
+              - key: "DIAL_API_KEY"
+                objectName: "%%DIAL_API_KEY_SECRET_NAME%%"
+              - key: "NEXTAUTH_SECRET"
+                objectName: "%%NEXTAUTH_SECRET_NAME%%"
+            secretName: admin-frontend-secrets
+            type: Opaque
+  env:
+    DIAL_API_URL: "%%DIAL_URL%%"
+    API_URL: "http://%%RELEASE_NAME%%-admin-backend.%%NAMESPACE%%.svc.cluster.local:80/admin"
+    NEXTAUTH_URL: "https://admin.%%DOMAIN%%/"
+  ingress:
+    enabled: true
+    ingressClassName: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "%%CLUSTER_ISSUER%%"
+    hosts:
+      - admin.%%DOMAIN%%
+    tls:
+      - secretName: "admin-tls-secret"
+        hosts:
+          - admin.%%DOMAIN%%
+
+pgvector:
+  enabled: false
+
+elasticsearch:
+  enabled: true
+  security:
+    enabled: true
+    existingSecret: "chat-backend-secrets"
+
+portal-frontend:
+  enabled: false
