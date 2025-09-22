@@ -165,7 +165,7 @@ Configuring authentication provider, encrypted secrets, model usage limits, Ingr
 
 1. Go to the Channels tab and click the Import button
 
-1. Import the [test channel archive](LINK_HERE) and wait for it to load (the `statgpt-app` channel should appear on the Channels tab)
+1. Import the [statgpt-app channel archive](statgpt-app-channel.zip) and wait for it to load (the `statgpt-app` channel should appear on the Channels tab)
 
 1. Now StatGPT is ready to be connected to the AI DIAL system
 
