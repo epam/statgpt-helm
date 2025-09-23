@@ -1,0 +1,522 @@
+# -- Backend version used for both chat-backend and admin-backend image tags (must be the same for both)
+_backend_version: &backend_version "0.1.0"
+_admin_frontend_version: &admin_frontend_version "0.1.0"
+_pgvector_version: &pgvector_version "16.3.0-debian-12-r14"
+_elasticsearch_version: &elasticsearch_version "8.14.3-debian-12-r0"
+
+chat-backend:
+  # -- Indicates whether the chat-backend service is enabled
+  enabled: false
+
+  ### Pods Security Context Configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  podSecurityContext:
+    # -- Enable security context for the pod
+    enabled: true
+    # -- User ID under which the pod runs
+    runAsUser: 5678
+
+  commonLabels:
+    # -- Kubernetes label to identify the component as an application
+    app.kubernetes.io/component: "application"
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: epam/statgpt-chat-backend
+    # -- Image tag or version
+    tag: *backend_version
+    # -- Image pull policy
+    pullPolicy: Always
+
+  ### Container Port Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  containerPorts:
+    # -- HTTP port for the application
+    http: 5000
+
+  ### Resource Management ###
+  # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    limits:
+      # -- Maximum CPU limit for the container
+      cpu: "1000m"
+      # -- Maximum memory limit for the container
+      memory: "4Gi"
+    requests:
+      # -- Minimum CPU request for resource scheduling
+      cpu: "100m"
+      # -- Minimum memory request for resource scheduling
+      memory: "2Gi"
+
+  metrics:
+    # -- Enable metrics collection
+    enabled: false
+    serviceMonitor:
+      # -- Enable Prometheus ServiceMonitor for metrics
+      enabled: false
+
+  ### Environment Variables ###
+  env:
+    # -- Name of the DIAL app for OpenTelemetry
+    DIAL_APP_NAME: "StatGPT"
+    # -- Authentication mode for DIAL
+    DIAL_AUTH_MODE: "user_token"
+    # -- Show debug stages in DIAL
+    DIAL_SHOW_DEBUG_STAGES: "false"
+    # -- Show stage seconds in DIAL
+    DIAL_SHOW_STAGE_SECONDS: "false"
+    # -- Number of concurrent web processes
+    WEB_CONCURRENCY: "1"
+    # -- Enable verbose logging for Langchain
+    LANGCHAIN_VERBOSE: "false"
+    # -- Enable debug logging for Langchain
+    LANGCHAIN_DEBUG: "false"
+    # -- Default seed for Langchain operations
+    LANGCHAIN_DEFAULT_SEED: "820288"
+
+    # -- URL for DIAL application
+    DIAL_URL: "environment-specific"
+    # -- Host for PGVector database
+    PGVECTOR_HOST: "environment-specific"
+    # -- Port for PGVector database
+    PGVECTOR_PORT: "environment-specific"
+    # -- Database name for PGVector
+    PGVECTOR_DATABASE: "environment-specific"
+    # -- Connection string for Elasticsearch
+    ELASTIC_CONNECTION_STRING: "environment-specific"
+    # -- Index for Elasticsearch indicators
+    ELASTIC_INDICATORS_INDEX: "environment-specific"
+    # -- Index for Elasticsearch matching
+    ELASTIC_MATCHING_INDEX: "environment-specific"
+
+    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    # DIAL_API_KEY: ""
+    # PGVECTOR_USER: ""
+    # PGVECTOR_PASSWORD: ""
+    # ELASTIC_AUTH_USER: ""
+    # ELASTIC_AUTH_PASSWORD: ""
+
+    ### DATA RELATED VARIABLES ###
+    # Configure these variables based on the data uploaded to the application
+    # Must be defined for both chat-backend and admin-backend
+    # Example:
+    # DATA_PORTAL_URL: ""
+    # DATA_PORTAL_API_KEY: ""
+
+admin-backend:
+  # -- Indicates whether the admin-backend service is enabled
+  enabled: false
+
+  commonLabels:
+    # -- Kubernetes label to identify the component as an application
+    app.kubernetes.io/component: "application"
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: epam/statgpt-admin-backend
+    # -- Image tag or version
+    tag: *backend_version
+    # -- Image pull policy
+    pullPolicy: Always
+
+  ### Init Containers Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  initContainers:
+    - name: alembic
+      image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: IfNotPresent
+      command:
+        - sh
+        - '-c'
+        - >-
+          alembic -c $APP_HOME/alembic.ini upgrade head
+      env:
+        - name: "APP_HOME"
+          value: "/home/app"
+        - name: "PGVECTOR_HOST"
+          value: "{{ .Values.env.PGVECTOR_HOST}}"
+        - name: "PGVECTOR_PORT"
+          value: "{{ .Values.env.PGVECTOR_PORT }}"
+        - name: "PGVECTOR_DATABASE"
+          value: "{{ .Values.env.PGVECTOR_DATABASE }}"
+        # Configuration via Kubernetes secrets is required
+        - name: "PGVECTOR_USER"
+          value: "{{ .Values.secrets.PGVECTOR_USER }}"
+        - name: "PGVECTOR_PASSWORD"
+          value: "{{ .Values.secrets.PGVECTOR_PASSWORD }}"
+
+  ### Container Port Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  containerPorts:
+    # -- HTTP port for the application
+    http: 8000
+
+  ### Resource Management ###
+  # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    limits:
+      # -- Maximum CPU limit for the container
+      cpu: "1000m"
+      # -- Maximum memory limit for the container
+      memory: "4Gi"
+    requests:
+      # -- Minimum CPU request for resource scheduling
+      cpu: "100m"
+      # -- Minimum memory request for resource scheduling
+      memory: "2Gi"
+
+  metrics:
+    # -- Enable metrics collection
+    enabled: false
+    serviceMonitor:
+      # -- Enable Prometheus ServiceMonitor for metrics
+      enabled: false
+
+  ### Environment Variables ###
+  env:
+    # -- Application mode for admin settings
+    ADMIN_MODE: "APP"
+    # -- Number of concurrent web processes
+    WEB_CONCURRENCY: "1"
+
+    # -- Enable or disable OIDC authentication
+    OIDC_AUTH_ENABLED: "environment-specific"  # Set to "true" to enable OIDC authentication
+    # -- URL to fetch OIDC configuration
+    OIDC_CONFIGURATION_ENDPOINT: "environment-specific"  # OIDC discovery endpoint
+    # -- Client ID for OIDC authentication
+    OIDC_CLIENT_ID: "environment-specific"  # Registered application client ID
+    # -- OIDC issuer URL
+    OIDC_ISSUER: "environment-specific"  # OIDC issuer URL
+    # -- Specify claim used for the username extraction
+    OIDC_USERNAME_CLAIM: "environment-specific"  # Claim from which to extract the username
+    # -- Claim used to identify user roles
+    ADMIN_ROLES_CLAIM: "environment-specific"  # Claim to extract admin roles from
+    # -- Values within the role claim that signify admin access
+    ADMIN_ROLES_VALUES: "environment-specific"  # Group ID representing admin roles
+    # -- If "true", the admin portal will check for scopes in the OIDC token, otherwise this check will be skipped
+    ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED: "environment-specific"
+    ### SCOPE VALIDATION VARIABLES (only required when ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED is "true") ###
+    # The name of the custom access token field that contains scope information
+    # ADMIN_SCOPE_CLAIM: "environment-specific"
+    # Required scope claim value to get access to admin portal if scope claim validation is enabled
+    # ADMIN_SCOPE_VALUE: "environment-specific"
+
+    # -- URL for DIAL application
+    DIAL_URL: "environment-specific"
+    # -- Host for PGVector database
+    PGVECTOR_HOST: "environment-specific"
+    # -- Port for PGVector database
+    PGVECTOR_PORT: "environment-specific"
+    # -- Database name for PGVector
+    PGVECTOR_DATABASE: "environment-specific"
+    # -- Connection string for Elasticsearch
+    ELASTIC_CONNECTION_STRING: "environment-specific"
+    # -- Index for Elasticsearch indicators
+    ELASTIC_INDICATORS_INDEX: "environment-specific"
+    # -- Index for Elasticsearch matching
+    ELASTIC_MATCHING_INDEX: "environment-specific"
+
+    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    # DIAL_API_KEY: ""
+    # PGVECTOR_USER: ""
+    # PGVECTOR_PASSWORD: ""
+    # ELASTIC_AUTH_USER: ""
+    # ELASTIC_AUTH_PASSWORD: ""
+
+    ### DATA RELATED VARIABLES ###
+    # Configure these variables based on the data uploaded to the application
+    # Must be defined for both chat-backend and admin-backend
+    # Example:
+    # DATA_PORTAL_URL: ""
+    # DATA_PORTAL_API_KEY: ""
+
+  ### Ingress Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    # -- Enable Ingress resource
+    enabled: false
+    # -- Specify the Ingress class name
+    ingressClassName: "nginx"
+    # -- Path for the Ingress resource
+    path: "/admin/api"
+    # -- NGINX annotations for proxy configuration
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+admin-frontend:
+  # -- Indicates whether the admin-frontend service is enabled
+  enabled: false
+
+  commonLabels:
+    # -- Kubernetes label to identify the component as an application
+    app.kubernetes.io/component: "application"
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: epam/statgpt-admin-frontend
+    # -- Image tag or version
+    tag: *admin_frontend_version
+    # -- Image pull policy
+    pullPolicy: Always
+
+  ### Container Port Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  containerPorts:
+    # -- HTTP port for the application
+    http: 3000
+
+  ### Resource Management ###
+  # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    limits:
+      # -- Maximum CPU limit for the container
+      cpu: "1000m"
+      # -- Maximum memory limit for the container
+      memory: "2Gi"
+    requests:
+      # -- Minimum CPU request for resource scheduling
+      cpu: "500m"
+      # -- Minimum memory request for resource scheduling
+      memory: "0.5Gi"
+
+  metrics:
+    # -- Enable metrics collection
+    enabled: false
+    serviceMonitor:
+      # -- Enable Prometheus ServiceMonitor for metrics
+      enabled: false
+
+  ### Environment Variables ###
+  env:
+    # -- DIAL API URL
+    DIAL_API_URL: "environment-specific"
+    # -- API URL for admin backend
+    API_URL: "environment-specific"
+    # -- URL for NextAuth service
+    NEXTAUTH_URL: "environment-specific"
+
+    # Keycloak Identity Provider
+    # -- Client ID for Keycloak
+    # AUTH_KEYCLOAK_CLIENT_ID: "environment-specific"
+    # -- URL for Keycloak
+    # AUTH_KEYCLOAK_HOST: "environment-specific"
+
+    # Azure Identity Provider
+    # -- Azure AD Client ID for authentication
+    # AUTH_AZURE_AD_CLIENT_ID: "environment-specific"
+    # -- Azure AD Application Name
+    # AUTH_AZURE_AD_NAME: "environment-specific"
+    # -- Azure Authority URL for authentication
+    # AUTH_AZURE_AUTHORITY_URL: "environment-specific"
+    # -- Azure AD Scopes for authentication
+    # AUTH_AZURE_AD_SCOPE: "environment-specific"
+    # -- Azure AD Tenant ID
+    # AUTH_AZURE_AD_TENANT_ID: "environment-specific"
+
+    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    # DIAL_API_KEY: ""
+    # NEXTAUTH_SECRET: ""
+    # AUTH_KEYCLOAK_SECRET: "" # Keycloak Identity Provider
+    # AUTH_AZURE_AD_SECRET: "" # Azure Identity Provider
+
+  ### Ingress Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    # -- Enable Ingress resource
+    enabled: false
+    # -- Specify the Ingress class name
+    ingressClassName: "nginx"
+    # -- Path for the Ingress resource
+    path: "/"
+    # -- NGINX annotations for proxy configuration
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+pgvector:
+  # -- Indicates whether the pgvector service is enabled
+  enabled: false
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: epam/statgpt-pgvector
+    # -- Image tag or version
+    tag: *pgvector_version
+
+  auth:
+    # -- Database name
+    database: "statgpt"
+
+    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    # postgresPassword: ""
+    # username: ""
+    # password: ""
+
+  primary:
+    resources:
+      limits:
+        # -- Maximum CPU limit for the container
+        cpu: "4000m"
+        # -- Maximum memory limit for the container
+        memory: "4Gi"
+      requests:
+        # -- Minimum CPU request for resource scheduling
+        cpu: "2000m"
+        # -- Minimum memory request for resource scheduling
+        memory: "2Gi"
+    initdb:
+      scripts:
+        01_init_extensions.sh: |
+          #!/bin/sh
+          export PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD
+          # -- Script to create PostgreSQL extensions if not exists
+          psql -U postgres -d $POSTGRES_DATABASE -c "create extension if not exists vector;"
+
+elasticsearch:
+  # -- Indicates whether the elasticsearch service is enabled
+  enabled: false
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: bitnami/elasticsearch
+    # -- Image tag or version
+    tag: *elasticsearch_version
+
+  # -- Indicates whether Kibana is enabled
+  kibanaEnabled: false
+
+  master:
+    # -- Specifies if master nodes are master-only
+    masterOnly: false
+    # -- Number of master replicas
+    replicaCount: 1
+    resources:
+      limits:
+        # -- Maximum CPU limit for the container
+        cpu: "1000m"
+        # -- Maximum memory limit for the container
+        memory: "1Gi"
+      requests:
+        # -- Minimum CPU request for resource scheduling
+        cpu: "500m"
+        # -- Minimum memory request for resource scheduling
+        memory: "0.5Gi"
+  data:
+    # -- Number of data node replicas
+    replicaCount: 0
+  coordinating:
+    # -- Number of coordinating node replicas
+    replicaCount: 0
+  ingest:
+    # -- Number of ingest node replicas
+    replicaCount: 0
+
+  security:
+    # -- Enable security features
+    enabled: false
+    # -- Auto-generate TLS certificates
+    tls:
+      autoGenerated: true
+
+    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    # elasticPassword: ""
+
+portal-frontend:
+  # -- Indicates whether the portal-frontend service is enabled
+  enabled: false
+
+  commonLabels:
+    # -- Kubernetes label to identify the component as an application
+    app.kubernetes.io/component: "application"
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: "environment-specific"
+    # -- Image repository name
+    repository: "environment-specific"
+    # -- Image tag or version
+    tag: "environment-specific"
+    # -- Image pull policy
+    pullPolicy: Always
+
+  ### Container Port Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  containerPorts:
+    # -- HTTP port for the application
+    http: 3000
+
+  ### Resource Management ###
+  # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    limits:
+      # -- Maximum CPU limit for the container
+      cpu: "1000m"
+      # -- Maximum memory limit for the container
+      memory: "4Gi"
+    requests:
+      # -- Minimum CPU request for resource scheduling
+      cpu: "100m"
+      # -- Minimum memory request for resource scheduling
+      memory: "0.5Gi"
+
+  metrics:
+    # -- Enable metrics collection
+    enabled: false
+    serviceMonitor:
+      # -- Enable Prometheus ServiceMonitor for metrics
+      enabled: false
+
+  ### Environment Variables ###
+  env:
+    # -- DIAL API URL
+    DIAL_API_URL: "environment-specific"
+    # -- DIAL API Version
+    DIAL_API_VERSION: "environment-specific"
+    # -- Default model
+    DEFAULT_MODEL: "environment-specific"
+    # -- SDMX API URL
+    SDMX_API_URL: "environment-specific"
+
+    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    # DIAL_API_KEY: ""
+    # SDMX_AUTH_KEY: ""
+
+  ### Ingress Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    # -- Enable Ingress resource
+    enabled: false
+    # -- Specify the Ingress class name
+    ingressClassName: "nginx"
+    # -- Path for the Ingress resource
+    path: "/"
+    # -- NGINX annotations for proxy configuration
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"

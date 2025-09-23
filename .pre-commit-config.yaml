@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+        exclude: |
+          (?x)^(
+            charts/statgpt/templates/.*\.yaml$|
+            charts/statgpt/templates/.*\.yml$
+          )
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending

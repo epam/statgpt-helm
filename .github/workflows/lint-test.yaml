@@ -1,0 +1,71 @@
+name: Lint and Test Charts
+
+on: pull_request
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
+        with:
+          version: v3.13.0
+
+      # Python is required because `ct lint` runs Yamale (https://github.com/23andMe/Yamale) and
+      # yamllint (https://github.com/adrienverge/yamllint) which require Python
+      - name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
+        with:
+          python-version: 3.x
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@0d28d3144d3a25ea2cc349d6e59901c4ff469b3b # v2.7.0
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config ct.yaml 2>/dev/null)
+          if [[ -n "$changed" ]]; then
+            echo "$changed" # to show in the logs
+            {
+              echo 'changed<<EOF'
+              echo "${changed}"
+              echo EOF
+            } >>$GITHUB_OUTPUT
+              echo "is_changed=true" >>$GITHUB_OUTPUT
+          fi
+
+      - name: Check documentation is up-to-date
+        if: steps.list-changed.outputs.is_changed == 'true'
+        env:
+          HELM_DOCS_VERSION: v1.11.3
+          CHANGED_CHARTS: ${{ steps.list-changed.outputs.changed }}
+        run: |
+          #!/bin/bash
+          IFS=$'\n'
+          for chart in $CHANGED_CHARTS; do
+            docker run --rm --volume "$(pwd):/helm-docs" -u "$(id -u)" jnorwood/helm-docs:${HELM_DOCS_VERSION} --chart-search-root=${chart}
+            if [[ $(git status --porcelain ${chart}/README.md) ]]; then
+              echo "::error::Documentation for ${chart} is not up-to-date. Please run \`helm-docs\` and commit changes!"
+              exit 1
+            else
+              echo "Documentation for ${chart} is up-to-date."
+            fi
+          done
+
+      - name: Run chart-testing (lint)
+        if: steps.list-changed.outputs.is_changed == 'true'
+        run: ct lint --config ct.yaml
+
+      - name: Create kind cluster
+        if: steps.list-changed.outputs.is_changed == 'true'
+        uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
+
+      - name: Run chart-testing (install)
+        if: steps.list-changed.outputs.is_changed == 'true'
+        run: ct install --config ct.yaml

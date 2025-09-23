@@ -1,0 +1,73 @@
+chat-backend:
+  enabled: true
+  env:
+    DIAL_URL: "%%DIAL_URL%%"
+    PGVECTOR_HOST: "%%RELEASE_NAME%%-pgvector.%%NAMESPACE%%.svc.cluster.local"
+    PGVECTOR_PORT: "5432"
+    PGVECTOR_DATABASE: "statgpt"
+    ELASTIC_CONNECTION_STRING: "http://%%RELEASE_NAME%%-elasticsearch.%%NAMESPACE%%.svc.cluster.local:9200"
+    ELASTIC_INDICATORS_INDEX: "statgpt-indicators"
+    ELASTIC_MATCHING_INDEX: "statgpt-matching"
+  secrets:
+    DIAL_API_KEY: "%%DIAL_API_KEY%%"
+    PGVECTOR_USER: "%%POSTGRES_DB_USERNAME%%"
+    PGVECTOR_PASSWORD: "%%POSTGRES_DB_PASSWORD%%"
+    ELASTIC_AUTH_USER: "%%ELASTIC_USERNAME%%"
+    ELASTIC_AUTH_PASSWORD: "%%ELASTIC_PASSWORD%%"
+
+admin-backend:
+  enabled: true
+  env:
+    OIDC_AUTH_ENABLED: "false"
+    ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED: "false"
+    DIAL_URL: "%%DIAL_URL%%"
+    PGVECTOR_HOST: "%%RELEASE_NAME%%-pgvector.%%NAMESPACE%%.svc.cluster.local"
+    PGVECTOR_PORT: "5432"
+    PGVECTOR_DATABASE: "statgpt"
+    ELASTIC_CONNECTION_STRING: "http://%%RELEASE_NAME%%-elasticsearch.%%NAMESPACE%%.svc.cluster.local:9200"
+    ELASTIC_INDICATORS_INDEX: "statgpt-indicators"
+    ELASTIC_MATCHING_INDEX: "statgpt-matching"
+  secrets:
+    DIAL_API_KEY: "%%DIAL_API_KEY%%"
+    PGVECTOR_USER: "%%POSTGRES_DB_USERNAME%%"
+    PGVECTOR_PASSWORD: "%%POSTGRES_DB_PASSWORD%%"
+    ELASTIC_AUTH_USER: "%%ELASTIC_USERNAME%%"
+    ELASTIC_AUTH_PASSWORD: "%%ELASTIC_PASSWORD%%"
+
+admin-frontend:
+  enabled: true
+  env:
+    DIAL_API_URL: "%%DIAL_URL%%"
+    API_URL: "http://%%RELEASE_NAME%%-admin-backend.%%NAMESPACE%%.svc.cluster.local:80/admin"
+    NEXTAUTH_URL: "https://admin.%%DOMAIN%%/"
+  secrets:
+    DIAL_API_KEY: "%%DIAL_API_KEY%%"
+    NEXTAUTH_SECRET: "%%NEXTAUTH_SECRET%%"
+  ingress:
+    enabled: true
+    ingressClassName: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "%%CLUSTER_ISSUER%%"
+    hosts:
+      - admin.%%DOMAIN%%
+    tls:
+      - secretName: "admin-tls-secret"
+        hosts:
+          - admin.%%DOMAIN%%
+
+pgvector:
+  enabled: true
+  auth:
+    database: "statgpt"
+    postgresPassword: "%%POSTGRES_ADMIN_PASSWORD%%"
+    username: "%%POSTGRES_DB_USERNAME%%"
+    password: "%%POSTGRES_DB_PASSWORD%%"
+
+elasticsearch:
+  enabled: true
+  security:
+    enabled: true
+    elasticPassword: "%%ELASTIC_PASSWORD%%"
+
+portal-frontend:
+  enabled: false
