@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -94,10 +94,11 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| _admin_frontend_version | string | `"0.1.0"` |  |
-| _backend_version | string | `"0.1.0"` | Backend version used for both chat-backend and admin-backend image tags (must be the same for both) |
-| _elasticsearch_version | string | `"8.14.3-debian-12-r0"` |  |
-| _pgvector_version | string | `"16.3.0-debian-12-r14"` |  |
+| _admin_frontend_version | string | `"0.1.0"` | Admin Frontend version is used for the admin-frontend image tag |
+| _backend_version | string | `"0.1.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
+| _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
+| _pgvector_image | string | `"pgvector/pgvector:pg16"` | PGVector image is used as a source for extension files for the pgvector component (must be aligned with _postgresql_version) |
+| _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
 | admin-backend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | admin-backend.containerPorts.http | int | `8000` | HTTP port for the application |
 | admin-backend.enabled | bool | `false` | Indicates whether the admin-backend service is enabled |
@@ -204,7 +205,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | elasticsearch.data.replicaCount | int | `0` | Number of data node replicas |
 | elasticsearch.enabled | bool | `false` | Indicates whether the elasticsearch service is enabled |
 | elasticsearch.image.registry | string | `"docker.io"` | Docker registry URL |
-| elasticsearch.image.repository | string | `"bitnami/elasticsearch"` | Image repository name |
+| elasticsearch.image.repository | string | `"bitnamilegacy/elasticsearch"` | Image repository name |
 | elasticsearch.image.tag | string | `"8.14.3-debian-12-r0"` | Image tag or version |
 | elasticsearch.ingest.replicaCount | int | `0` | Number of ingest node replicas |
 | elasticsearch.kibanaEnabled | bool | `false` | Indicates whether Kibana is enabled |
@@ -219,9 +220,12 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | pgvector.auth.database | string | `"statgpt"` | Database name |
 | pgvector.enabled | bool | `false` | Indicates whether the pgvector service is enabled |
 | pgvector.image.registry | string | `"docker.io"` | Docker registry URL |
-| pgvector.image.repository | string | `"epam/statgpt-pgvector"` | Image repository name |
+| pgvector.image.repository | string | `"bitnamilegacy/postgresql"` | Image repository name |
 | pgvector.image.tag | string | `"16.3.0-debian-12-r14"` | Image tag or version |
-| pgvector.primary.initdb.scripts."01_init_extensions.sh" | string | `"#!/bin/sh\nexport PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD\n# -- Script to create PostgreSQL extensions if not exists\npsql -U postgres -d $POSTGRES_DATABASE -c \"create extension if not exists vector;\"\n"` |  |
+| pgvector.primary.extraVolumeMounts | list | `[{"mountPath":"/opt/bitnami/postgresql/lib","name":"pgvector-extension","subPath":"lib"},{"mountPath":"/opt/bitnami/postgresql/share/extension","name":"pgvector-extension","subPath":"extension"}]` | Mount pgvector extension files to correct Bitnami PostgreSQL paths |
+| pgvector.primary.extraVolumes | list | `[{"emptyDir":{},"name":"pgvector-extension"}]` | Shared volume for pgvector extension files |
+| pgvector.primary.initContainers | list | `[{"command":["/bin/bash","-c","set -e\necho \"Copying pgvector extension files from official pgvector image...\"\n\n# Create directories in shared volume\nmkdir -p /shared/lib /shared/extension\n\n# Copy pre-built pgvector extension files\ncp /usr/lib/postgresql/*/lib/vector.so /shared/lib/\ncp /usr/share/postgresql/*/extension/vector* /shared/extension/\n\n# Set proper ownership for Bitnami PostgreSQL (user 1001)\nchown -R 1001:1001 /shared\n\necho \"pgvector extension files copied successfully\"\n"],"image":"pgvector/pgvector:pg16","name":"copy-pgvector","securityContext":{"runAsNonRoot":false,"runAsUser":0},"volumeMounts":[{"mountPath":"/shared","name":"pgvector-extension"}]}]` | Copy pgvector extension files from official pgvector image using init container |
+| pgvector.primary.initdb | object | `{"scripts":{"01_create_extension.sql":"-- Create the vector extension in the database\n-- Extension files are available from the init container\nCREATE EXTENSION IF NOT EXISTS vector;\n"}}` | Create the vector extension in the database |
 | pgvector.primary.resources.limits.cpu | string | `"4000m"` | Maximum CPU limit for the container |
 | pgvector.primary.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | pgvector.primary.resources.requests.cpu | string | `"2000m"` | Minimum CPU request for resource scheduling |
