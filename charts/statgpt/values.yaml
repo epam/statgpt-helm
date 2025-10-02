@@ -1,7 +1,12 @@
-# -- Backend version used for both chat-backend and admin-backend image tags (must be the same for both)
+# -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
 _backend_version: &backend_version "0.1.0"
+# -- Admin Frontend version is used for the admin-frontend image tag
 _admin_frontend_version: &admin_frontend_version "0.1.0"
-_pgvector_version: &pgvector_version "16.3.0-debian-12-r14"
+# -- PostgreSQL version is used for the postgresql image tag
+_postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
+# -- PGVector image is used as a source for extension files for the pgvector component (must be aligned with _postgresql_version)
+_pgvector_image: &pgvector_image "pgvector/pgvector:pg16"
+# -- Elasticsearch version is used for the elasticsearch image tag
 _elasticsearch_version: &elasticsearch_version "8.14.3-debian-12-r0"
 
 chat-backend:
@@ -358,9 +363,9 @@ pgvector:
     # -- Docker registry URL
     registry: docker.io
     # -- Image repository name
-    repository: epam/statgpt-pgvector
+    repository: bitnamilegacy/postgresql
     # -- Image tag or version
-    tag: *pgvector_version
+    tag: *postgresql_version
 
   auth:
     # -- Database name
@@ -383,13 +388,57 @@ pgvector:
         cpu: "2000m"
         # -- Minimum memory request for resource scheduling
         memory: "2Gi"
+
+    # -- Copy pgvector extension files from official pgvector image using init container
+    initContainers:
+      - name: copy-pgvector
+        image: *pgvector_image
+        command:
+          - /bin/bash
+          - -c
+          - |
+            set -e
+            echo "Copying pgvector extension files from official pgvector image..."
+
+            # Create directories in shared volume
+            mkdir -p /shared/lib /shared/extension
+
+            # Copy pre-built pgvector extension files
+            cp /usr/lib/postgresql/*/lib/vector.so /shared/lib/
+            cp /usr/share/postgresql/*/extension/vector* /shared/extension/
+
+            # Set proper ownership for Bitnami PostgreSQL (user 1001)
+            chown -R 1001:1001 /shared
+
+            echo "pgvector extension files copied successfully"
+        volumeMounts:
+          - name: pgvector-extension
+            mountPath: /shared
+        securityContext:
+          runAsUser: 0
+          runAsNonRoot: false
+
+    # -- Shared volume for pgvector extension files
+    extraVolumes:
+      - name: pgvector-extension
+        emptyDir: {}
+
+    # -- Mount pgvector extension files to correct Bitnami PostgreSQL paths
+    extraVolumeMounts:
+      - name: pgvector-extension
+        mountPath: /opt/bitnami/postgresql/lib
+        subPath: lib
+      - name: pgvector-extension
+        mountPath: /opt/bitnami/postgresql/share/extension
+        subPath: extension
+
+    # -- Create the vector extension in the database
     initdb:
       scripts:
-        01_init_extensions.sh: |
-          #!/bin/sh
-          export PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD
-          # -- Script to create PostgreSQL extensions if not exists
-          psql -U postgres -d $POSTGRES_DATABASE -c "create extension if not exists vector;"
+        01_create_extension.sql: |
+          -- Create the vector extension in the database
+          -- Extension files are available from the init container
+          CREATE EXTENSION IF NOT EXISTS vector;
 
 elasticsearch:
   # -- Indicates whether the elasticsearch service is enabled
@@ -401,7 +450,7 @@ elasticsearch:
     # -- Docker registry URL
     registry: docker.io
     # -- Image repository name
-    repository: bitnami/elasticsearch
+    repository: bitnamilegacy/elasticsearch
     # -- Image tag or version
     tag: *elasticsearch_version
 
