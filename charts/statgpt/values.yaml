@@ -367,6 +367,16 @@ pgvector:
     # -- Image tag or version
     tag: *postgresql_version
 
+  metrics:
+    image:
+      # -- Fix: override deprecated repository with the updated one
+      repository: bitnamilegacy/postgres-exporter
+
+  volumePermissions:
+    image:
+      # -- Fix: override deprecated repository with the updated one
+      repository: bitnamilegacy/os-shell
+
   auth:
     # -- Database name
     database: "statgpt"
@@ -453,6 +463,20 @@ elasticsearch:
     repository: bitnamilegacy/elasticsearch
     # -- Image tag or version
     tag: *elasticsearch_version
+
+  metrics:
+    image:
+      # -- Fix: override deprecated repository with the updated one
+      repository: bitnamilegacy/elasticsearch-exporter
+
+  volumePermissions:
+    image:
+      # -- Fix: override deprecated repository with the updated one
+      repository: bitnamilegacy/os-shell
+
+  sysctlImage:
+    # -- Fix: override deprecated repository with the updated one
+    repository: bitnamilegacy/os-shell
 
   # -- Indicates whether Kibana is enabled
   kibanaEnabled: false
