@@ -6,6 +6,67 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-10-07T13:31:46.505841205Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.14.1
+    - alias: chat-backend
+      condition: chat-backend.enabled
+      name: dial-extension
+      repository: https://charts.epam-rail.com
+      version: 1.3.2
+    - alias: admin-backend
+      condition: admin-backend.enabled
+      name: dial-extension
+      repository: https://charts.epam-rail.com
+      version: 1.3.2
+    - alias: admin-frontend
+      condition: admin-frontend.enabled
+      name: dial-extension
+      repository: https://charts.epam-rail.com
+      version: 1.3.2
+    - alias: pgvector
+      condition: pgvector.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.5.5
+    - alias: elasticsearch
+      condition: elasticsearch.enabled
+      name: elasticsearch
+      repository: https://charts.bitnami.com/bitnami
+      version: 21.3.2
+    - alias: portal-frontend
+      condition: portal-frontend.enabled
+      name: dial-extension
+      repository: https://charts.epam-rail.com
+      version: 1.3.2
+    description: Umbrella chart for StatGPT solution
+    digest: daf6baf6484a0c0f10bc7a85c1988e52a383824e0637b3911b3569bb62440464
+    home: https://statgpt.dialx.ai
+    icon: https://statgpt.dialx.ai/icon.svg
+    keywords:
+    - statgpt
+    - ai-dial
+    - llm
+    - sdmx
+    kubeVersion: '>=1.23.0-0'
+    maintainers:
+    - name: EPAM Systems
+      url: https://github.com/epam
+    name: statgpt
+    sources:
+    - https://github.com/epam/statgpt-helm
+    urls:
+    - https://github.com/epam/statgpt-helm/releases/download/statgpt-1.0.4/statgpt-1.0.4.tgz
+    version: 1.0.4
+  - annotations:
+      category: MachineLearning
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: 1.0.0
     created: "2025-10-07T10:43:25.289601643Z"
     dependencies:
     - name: common
@@ -245,4 +306,4 @@ entries:
     urls:
     - https://github.com/epam/statgpt-helm/releases/download/statgpt-1.0.0/statgpt-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-07T10:43:25.289622954Z"
+generated: "2025-10-07T13:31:46.505866222Z"
