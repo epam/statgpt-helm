@@ -4,8 +4,8 @@ _backend_version: &backend_version "0.1.0"
 _admin_frontend_version: &admin_frontend_version "0.1.0"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
-# -- PGVector image is used as a source for extension files for the pgvector component (must be aligned with _postgresql_version)
-_pgvector_image: &pgvector_image "pgvector/pgvector:pg16"
+# -- PGVector extension version
+_pgvector_version: &pgvector_version "v0.8.1"
 # -- Elasticsearch version is used for the elasticsearch image tag
 _elasticsearch_version: &elasticsearch_version "8.14.3-debian-12-r0"
 
@@ -386,6 +386,12 @@ pgvector:
     # username: ""
     # password: ""
 
+  # -- PostgreSQL shared preload libraries including pgaudit for auditing and vector for pgvector extension
+  postgresqlSharedPreloadLibraries: "pgaudit,vector"
+
+  # -- PGVector extension version to build and install
+  pgvectorVersion: *pgvector_version
+
   primary:
     resources:
       limits:
@@ -399,56 +405,85 @@ pgvector:
         # -- Minimum memory request for resource scheduling
         memory: "2Gi"
 
-    # -- Copy pgvector extension files from official pgvector image using init container
+    # -- Build and install pgvector extension by copying existing PostgreSQL directories and adding pgvector files
     initContainers:
-      - name: copy-pgvector
-        image: *pgvector_image
+      - name: setup-pgvector
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         command:
           - /bin/bash
           - -c
           - |
             set -e
-            echo "Copying pgvector extension files from official pgvector image..."
+            echo "=== Setting up PostgreSQL with pgvector extension ==="
 
-            # Create directories in shared volume
-            mkdir -p /shared/lib /shared/extension
+            PGVECTOR_VERSION="{{ .Values.pgvectorVersion }}"
+            echo "Installing pgvector version: $PGVECTOR_VERSION"
 
-            # Copy pre-built pgvector extension files
-            cp /usr/lib/postgresql/*/lib/vector.so /shared/lib/
-            cp /usr/share/postgresql/*/extension/vector* /shared/extension/
+            # Create directory structure in shared volume
+            mkdir -p /shared/postgresql-files/lib /shared/postgresql-files/share
 
-            # Set proper ownership for Bitnami PostgreSQL (user 1001)
+            # Copy entire existing PostgreSQL directories to preserve all libraries and extensions
+            echo "Copying existing PostgreSQL directories..."
+            cp -r /opt/bitnami/postgresql/lib/* /shared/postgresql-files/lib/
+            cp -r /opt/bitnami/postgresql/share/* /shared/postgresql-files/share/
+
+            # Install build dependencies for compiling pgvector
+            echo "Installing build dependencies..."
+            install_packages git build-essential
+
+            # Clone and build pgvector from source
+            echo "Building pgvector extension version $PGVECTOR_VERSION..."
+            cd /tmp
+            git clone --branch "$PGVECTOR_VERSION" https://github.com/pgvector/pgvector.git
+            cd pgvector
+            export PG_CONFIG=/opt/bitnami/postgresql/bin/pg_config
+            make clean && make
+
+            # Add compiled pgvector files to the copied PostgreSQL directories
+            echo "Installing pgvector files..."
+            cp vector.so /shared/postgresql-files/lib/
+            cp sql/vector--*.sql /shared/postgresql-files/share/extension/
+            cp vector.control /shared/postgresql-files/share/extension/
+
+            # Set proper ownership for Bitnami PostgreSQL user
             chown -R 1001:1001 /shared
 
-            echo "pgvector extension files copied successfully"
+            # Verify installation
+            echo "Verifying pgvector installation..."
+            ls -la /shared/postgresql-files/lib/vector.so
+            ls -la /shared/postgresql-files/share/extension/vector.control
+
+            echo "=== pgvector $PGVECTOR_VERSION setup completed successfully ==="
         volumeMounts:
-          - name: pgvector-extension
+          - name: postgresql-files
             mountPath: /shared
         securityContext:
           runAsUser: 0
           runAsNonRoot: false
 
-    # -- Shared volume for pgvector extension files
+    # -- Shared volume for storing complete PostgreSQL directories with pgvector extension
     extraVolumes:
-      - name: pgvector-extension
+      - name: postgresql-files
         emptyDir: {}
 
-    # -- Mount pgvector extension files to correct Bitnami PostgreSQL paths
+    # -- Mount complete PostgreSQL directories (lib and share) with pgvector extension included
     extraVolumeMounts:
-      - name: pgvector-extension
+      - name: postgresql-files
         mountPath: /opt/bitnami/postgresql/lib
-        subPath: lib
-      - name: pgvector-extension
-        mountPath: /opt/bitnami/postgresql/share/extension
-        subPath: extension
+        subPath: postgresql-files/lib
+      - name: postgresql-files
+        mountPath: /opt/bitnami/postgresql/share
+        subPath: postgresql-files/share
 
-    # -- Create the vector extension in the database
+    # -- Database initialization scripts to create the vector extension after PostgreSQL startup
     initdb:
       scripts:
         01_create_extension.sql: |
           -- Create the vector extension in the database
-          -- Extension files are available from the init container
           CREATE EXTENSION IF NOT EXISTS vector;
+
+          -- Display installed extensions for verification
+          \dx
 
 elasticsearch:
   # -- Indicates whether the elasticsearch service is enabled
