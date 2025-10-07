@@ -478,12 +478,19 @@ pgvector:
     # -- Database initialization scripts to create the vector extension after PostgreSQL startup
     initdb:
       scripts:
-        01_create_extension.sql: |
-          -- Create the vector extension in the database
-          CREATE EXTENSION IF NOT EXISTS vector;
+        01_create_extension.sh: |
+          #!/bin/sh
+          set -e
 
-          -- Display installed extensions for verification
-          \dx
+          export PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD
+
+          echo "=== Creating the vector extension in the database ==="
+          psql -U postgres -d $POSTGRES_DATABASE -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+          echo "Currently installed extensions:"
+          psql -U postgres -d $POSTGRES_DATABASE -c "\dx"
+
+          echo "=== The vector extension has been successfully created in the database ==="
 
 elasticsearch:
   # -- Indicates whether the elasticsearch service is enabled
