@@ -43,6 +43,18 @@ chat-backend:
     # -- HTTP port for the application
     http: 5000
 
+  ### Liveness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable livenessProbe
+    enabled: true
+
+  ### Readiness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  readinessProbe:
+    # -- Enable readinessProbe
+    enabled: true
+
   ### Resource Management ###
   # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   resources:
@@ -164,6 +176,18 @@ admin-backend:
     # -- HTTP port for the application
     http: 8000
 
+  ### Liveness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable livenessProbe
+    enabled: true
+
+  ### Readiness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  readinessProbe:
+    # -- Enable readinessProbe
+    enabled: true
+
   ### Resource Management ###
   # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   resources:
@@ -283,6 +307,26 @@ admin-frontend:
   containerPorts:
     # -- HTTP port for the application
     http: 3000
+
+  ### Liveness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable livenessProbe
+    enabled: true
+    # -- HTTP GET request configuration for liveness probe
+    httpGet:
+      # -- Health check endpoint path
+      path: /api/health
+
+  ### Readiness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  readinessProbe:
+    # -- Enable readinessProbe
+    enabled: true
+    # -- HTTP GET request configuration for liveness probe
+    httpGet:
+      # -- Health check endpoint path
+      path: /api/health
 
   ### Resource Management ###
   # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
@@ -584,6 +628,26 @@ portal-frontend:
   containerPorts:
     # -- HTTP port for the application
     http: 3000
+
+  ### Liveness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable livenessProbe
+    enabled: true
+    # -- HTTP GET request configuration for liveness probe
+    httpGet:
+      # -- Health check endpoint path
+      path: /api/health
+
+  ### Readiness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  readinessProbe:
+    # -- Enable readinessProbe
+    enabled: true
+    # -- HTTP GET request configuration for liveness probe
+    httpGet:
+      # -- Health check endpoint path
+      path: /api/health
 
   ### Resource Management ###
   # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
