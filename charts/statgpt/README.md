@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.0.4](https://img.shields.io/badge/Version-1.0.4-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -145,8 +145,10 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.initContainers[0].image | string | `"{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"` |  |
 | admin-backend.initContainers[0].imagePullPolicy | string | `"IfNotPresent"` |  |
 | admin-backend.initContainers[0].name | string | `"alembic"` |  |
+| admin-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | admin-backend.metrics.enabled | bool | `false` | Enable metrics collection |
 | admin-backend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
+| admin-backend.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
 | admin-backend.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
 | admin-backend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | admin-backend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
@@ -165,8 +167,14 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | admin-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
 | admin-frontend.ingress.path | string | `"/"` | Path for the Ingress resource |
+| admin-frontend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| admin-frontend.livenessProbe.httpGet | object | `{"path":"/api/health"}` | HTTP GET request configuration for liveness probe |
+| admin-frontend.livenessProbe.httpGet.path | string | `"/api/health"` | Health check endpoint path |
 | admin-frontend.metrics.enabled | bool | `false` | Enable metrics collection |
 | admin-frontend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
+| admin-frontend.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
+| admin-frontend.readinessProbe.httpGet | object | `{"path":"/api/health"}` | HTTP GET request configuration for liveness probe |
+| admin-frontend.readinessProbe.httpGet.path | string | `"/api/health"` | Health check endpoint path |
 | admin-frontend.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
 | admin-frontend.resources.limits.memory | string | `"2Gi"` | Maximum memory limit for the container |
 | admin-frontend.resources.requests.cpu | string | `"500m"` | Minimum CPU request for resource scheduling |
@@ -193,10 +201,12 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | chat-backend.image.repository | string | `"epam/statgpt-chat-backend"` | Image repository name |
 | chat-backend.image.tag | string | `"0.1.0"` | Image tag or version |
+| chat-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | chat-backend.metrics.enabled | bool | `false` | Enable metrics collection |
 | chat-backend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
 | chat-backend.podSecurityContext.enabled | bool | `true` | Enable security context for the pod |
 | chat-backend.podSecurityContext.runAsUser | int | `5678` | User ID under which the pod runs |
+| chat-backend.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
 | chat-backend.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
 | chat-backend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | chat-backend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
@@ -252,9 +262,18 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | portal-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
 | portal-frontend.ingress.path | string | `"/"` | Path for the Ingress resource |
+| portal-frontend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| portal-frontend.livenessProbe.httpGet | object | `{"path":"/api/health"}` | HTTP GET request configuration for liveness probe |
+| portal-frontend.livenessProbe.httpGet.path | string | `"/api/health"` | Health check endpoint path |
 | portal-frontend.metrics.enabled | bool | `false` | Enable metrics collection |
 | portal-frontend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
+| portal-frontend.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
+| portal-frontend.readinessProbe.httpGet | object | `{"path":"/api/health"}` | HTTP GET request configuration for liveness probe |
+| portal-frontend.readinessProbe.httpGet.path | string | `"/api/health"` | Health check endpoint path |
 | portal-frontend.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
 | portal-frontend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | portal-frontend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
 | portal-frontend.resources.requests.memory | string | `"0.5Gi"` | Minimum memory request for resource scheduling |
+
+--------------------------------------------------
+Generated from chart metadata using [helm-docs](https://github.com/norwoodj/helm-docs): `docker run --rm --volume "$(pwd):/helm-docs" -u $(id -u) jnorwood/helm-docs:latest`
