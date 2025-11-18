@@ -149,7 +149,7 @@ admin-backend:
   initContainers:
     - name: alembic
       image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: "{{ .Values.image.pullPolicy }}"
       command:
         - sh
         - '-c'
@@ -614,11 +614,11 @@ portal-frontend:
   ### Container Image Configuration ###
   # ref: https://kubernetes.io/docs/concepts/containers/images/
   image:
-    # -- Docker registry URL
+    # -- Docker registry URL (e.g., "docker.io")
     registry: "environment-specific"
-    # -- Image repository name
+    # -- Image repository name (e.g., "epam/statgpt-global-trusted-data-commons")
     repository: "environment-specific"
-    # -- Image tag or version
+    # -- Image tag or version (e.g., "0.1.0")
     tag: "environment-specific"
     # -- Image pull policy
     pullPolicy: Always

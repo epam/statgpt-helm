@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.6](https://img.shields.io/badge/Version-1.0.6-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -143,7 +143,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.initContainers[0].env[5].name | string | `"PGVECTOR_PASSWORD"` |  |
 | admin-backend.initContainers[0].env[5].value | string | `"{{ .Values.secrets.PGVECTOR_PASSWORD }}"` |  |
 | admin-backend.initContainers[0].image | string | `"{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"` |  |
-| admin-backend.initContainers[0].imagePullPolicy | string | `"IfNotPresent"` |  |
+| admin-backend.initContainers[0].imagePullPolicy | string | `"{{ .Values.image.pullPolicy }}"` |  |
 | admin-backend.initContainers[0].name | string | `"alembic"` |  |
 | admin-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | admin-backend.metrics.enabled | bool | `false` | Enable metrics collection |
@@ -255,9 +255,9 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.env.DIAL_API_VERSION | string | `"environment-specific"` | DIAL API Version |
 | portal-frontend.env.SDMX_API_URL | string | `"environment-specific"` | SDMX API URL |
 | portal-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
-| portal-frontend.image.registry | string | `"environment-specific"` | Docker registry URL |
-| portal-frontend.image.repository | string | `"environment-specific"` | Image repository name |
-| portal-frontend.image.tag | string | `"environment-specific"` | Image tag or version |
+| portal-frontend.image.registry | string | `"environment-specific"` | Docker registry URL (e.g., "docker.io") |
+| portal-frontend.image.repository | string | `"environment-specific"` | Image repository name (e.g., "epam/statgpt-global-trusted-data-commons") |
+| portal-frontend.image.tag | string | `"environment-specific"` | Image tag or version (e.g., "0.1.0") |
 | portal-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | portal-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | portal-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |

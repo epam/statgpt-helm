@@ -54,4 +54,4 @@ maintainers:
 name: statgpt
 sources:
   - https://github.com/epam/statgpt-helm
-version: 1.0.5
+version: 1.0.6
