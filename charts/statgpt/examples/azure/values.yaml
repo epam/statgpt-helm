@@ -217,7 +217,7 @@ pgvector:
 elasticsearch:
   enabled: true
   security:
-    enabled: true
+    enabled: false
     existingSecret: "chat-backend-secrets"
 
 portal-frontend:

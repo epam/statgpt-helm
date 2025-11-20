@@ -1,0 +1,66 @@
+chat-backend:
+  enabled: true
+  fullnameOverride: "statgpt-chat-backend"
+  env:
+    DIAL_URL: &DIAL_URL "http://dial-core"
+    PGVECTOR_HOST: &PGVECTOR_HOST "statgpt-pgvector"
+    PGVECTOR_PORT: &PGVECTOR_PORT "5432"
+    PGVECTOR_DATABASE: &PGVECTOR_DATABASE "statgpt"
+    ELASTIC_CONNECTION_STRING: &ELASTIC_CONNECTION_STRING "http://statgpt-elasticsearch:9200"
+    ELASTIC_INDICATORS_INDEX: &ELASTIC_INDICATORS_INDEX "statgpt-test-indicators"
+    ELASTIC_MATCHING_INDEX: &ELASTIC_MATCHING_INDEX "statgpt-test-matching"
+  secrets:
+    DIAL_API_KEY: &DIAL_API_KEY "DIAL_API_KEY"
+    PGVECTOR_USER: &PGVECTOR_USER "statgpt"
+    PGVECTOR_PASSWORD: &PGVECTOR_PASSWORD "password"
+    ELASTIC_AUTH_USER: &ELASTIC_AUTH_USER "statgpt"
+    ELASTIC_AUTH_PASSWORD: &ELASTIC_AUTH_PASSWORD "password"
+
+admin-backend:
+  enabled: true
+  fullnameOverride: "statgpt-admin-backend"
+  env:
+    OIDC_AUTH_ENABLED: "false"
+    DIAL_URL: *DIAL_URL
+    PGVECTOR_HOST: *PGVECTOR_HOST
+    PGVECTOR_PORT: *PGVECTOR_PORT
+    PGVECTOR_DATABASE: *PGVECTOR_DATABASE
+    ELASTIC_CONNECTION_STRING: *ELASTIC_CONNECTION_STRING
+    ELASTIC_INDICATORS_INDEX: *ELASTIC_INDICATORS_INDEX
+    ELASTIC_MATCHING_INDEX: *ELASTIC_MATCHING_INDEX
+  secrets:
+    DIAL_API_KEY: *DIAL_API_KEY
+    PGVECTOR_USER: *PGVECTOR_USER
+    PGVECTOR_PASSWORD: *PGVECTOR_PASSWORD
+    ELASTIC_AUTH_USER: *ELASTIC_AUTH_USER
+    ELASTIC_AUTH_PASSWORD: *ELASTIC_AUTH_PASSWORD
+
+admin-frontend:
+  enabled: true
+  fullnameOverride: "statgpt-admin-frontend"
+  env:
+    DIAL_API_URL: *DIAL_URL
+    API_URL: "http://statgpt-admin-backend/admin"
+    NEXTAUTH_URL: "http://statgpt-admin-frontend"
+  secrets:
+    DIAL_API_KEY: *DIAL_API_KEY
+    NEXTAUTH_SECRET: "NEXTAUTH_SECRET"
+
+pgvector:
+  enabled: true
+  fullnameOverride: "statgpt-pgvector"
+  auth:
+    database: *PGVECTOR_DATABASE
+    postgresPassword: "postgresPassword"
+    username: *PGVECTOR_USER
+    password: *PGVECTOR_PASSWORD
+
+elasticsearch:
+  enabled: true
+  fullnameOverride: "statgpt-elasticsearch"
+  security:
+    enabled: false
+    elasticPassword: *ELASTIC_AUTH_PASSWORD
+
+portal-frontend:
+  enabled: false
