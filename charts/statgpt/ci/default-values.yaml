@@ -1,6 +1,13 @@
 chat-backend:
   enabled: true
   fullnameOverride: "statgpt-chat-backend"
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+    requests:
+      cpu: "100m"
+      memory: "0.5Gi"
   env:
     DIAL_URL: &DIAL_URL "http://dial-core"
     PGVECTOR_HOST: &PGVECTOR_HOST "statgpt-pgvector"
@@ -19,8 +26,16 @@ chat-backend:
 admin-backend:
   enabled: true
   fullnameOverride: "statgpt-admin-backend"
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+    requests:
+      cpu: "100m"
+      memory: "0.5Gi"
   env:
     OIDC_AUTH_ENABLED: "false"
+    ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED: "false"
     DIAL_URL: *DIAL_URL
     PGVECTOR_HOST: *PGVECTOR_HOST
     PGVECTOR_PORT: *PGVECTOR_PORT
@@ -38,6 +53,13 @@ admin-backend:
 admin-frontend:
   enabled: true
   fullnameOverride: "statgpt-admin-frontend"
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+    requests:
+      cpu: "250m"
+      memory: "0.25Gi"
   env:
     DIAL_API_URL: *DIAL_URL
     API_URL: "http://statgpt-admin-backend/admin"
@@ -49,6 +71,14 @@ admin-frontend:
 pgvector:
   enabled: true
   fullnameOverride: "statgpt-pgvector"
+  primary:
+    resources:
+      limits:
+        cpu: "1"
+        memory: "1Gi"
+      requests:
+        cpu: "250m"
+        memory: "0.5Gi"
   auth:
     database: *PGVECTOR_DATABASE
     postgresPassword: "postgresPassword"
@@ -58,6 +88,15 @@ pgvector:
 elasticsearch:
   enabled: true
   fullnameOverride: "statgpt-elasticsearch"
+  master:
+    heapSize: 128m
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "0.5Gi"
+      requests:
+        cpu: "250m"
+        memory: "0.25Gi"
   security:
     enabled: false
     elasticPassword: *ELASTIC_AUTH_PASSWORD
