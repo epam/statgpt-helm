@@ -20,7 +20,7 @@ chat-backend:
     DIAL_API_KEY: &DIAL_API_KEY "DIAL_API_KEY"
     PGVECTOR_USER: &PGVECTOR_USER "statgpt"
     PGVECTOR_PASSWORD: &PGVECTOR_PASSWORD "password"
-    ELASTIC_AUTH_USER: &ELASTIC_AUTH_USER "statgpt"
+    ELASTIC_AUTH_USER: &ELASTIC_AUTH_USER "elastic"
     ELASTIC_AUTH_PASSWORD: &ELASTIC_AUTH_PASSWORD "password"
 
 admin-backend:
@@ -98,7 +98,7 @@ elasticsearch:
         cpu: "250m"
         memory: "0.25Gi"
   security:
-    enabled: false
+    enabled: true
     elasticPassword: *ELASTIC_AUTH_PASSWORD
 
 portal-frontend:
