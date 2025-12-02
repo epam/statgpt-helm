@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.0.6](https://img.shields.io/badge/Version-1.0.6-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.7](https://img.shields.io/badge/Version-1.0.7-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -103,18 +103,20 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.containerPorts.http | int | `8000` | HTTP port for the application |
 | admin-backend.enabled | bool | `false` | Indicates whether the admin-backend service is enabled |
 | admin-backend.env.ADMIN_MODE | string | `"APP"` | Application mode for admin settings |
-| admin-backend.env.ADMIN_ROLES_CLAIM | string | `"environment-specific"` | Claim used to identify user roles |
-| admin-backend.env.ADMIN_ROLES_VALUES | string | `"environment-specific"` | Values within the role claim that signify admin access |
-| admin-backend.env.ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED | string | `"environment-specific"` | If "true", the admin portal will check for scopes in the OIDC token, otherwise this check will be skipped |
+| admin-backend.env.ADMIN_ROLES_CLAIM | string | `"environment-specific"` | Claim used to identify user roles (required if OIDC_AUTH_ENABLED="true") |
+| admin-backend.env.ADMIN_ROLES_VALUES | string | `"environment-specific"` | Values within the role claim that signify admin access (required if OIDC_AUTH_ENABLED="true") |
+| admin-backend.env.ADMIN_SCOPE_CLAIM | string | `"environment-specific"` | Name of the access token field (required if OIDC_AUTH_ENABLED="true" and ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED="true") |
+| admin-backend.env.ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED | string | `"true"` | If "true", the admin portal will check for scopes in the OIDC token, otherwise this check will be skipped |
+| admin-backend.env.ADMIN_SCOPE_VALUE | string | `"environment-specific"` | Scope claim value (required if OIDC_AUTH_ENABLED="true" and ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED="true") |
 | admin-backend.env.DIAL_URL | string | `"environment-specific"` | URL for DIAL application |
 | admin-backend.env.ELASTIC_CONNECTION_STRING | string | `"environment-specific"` | Connection string for Elasticsearch |
 | admin-backend.env.ELASTIC_INDICATORS_INDEX | string | `"environment-specific"` | Index for Elasticsearch indicators |
 | admin-backend.env.ELASTIC_MATCHING_INDEX | string | `"environment-specific"` | Index for Elasticsearch matching |
-| admin-backend.env.OIDC_AUTH_ENABLED | string | `"environment-specific"` | Enable or disable OIDC authentication |
-| admin-backend.env.OIDC_CLIENT_ID | string | `"environment-specific"` | Client ID for OIDC authentication |
-| admin-backend.env.OIDC_CONFIGURATION_ENDPOINT | string | `"environment-specific"` | URL to fetch OIDC configuration |
-| admin-backend.env.OIDC_ISSUER | string | `"environment-specific"` | OIDC issuer URL |
-| admin-backend.env.OIDC_USERNAME_CLAIM | string | `"environment-specific"` | Specify claim used for the username extraction |
+| admin-backend.env.OIDC_AUTH_ENABLED | string | `"true"` | Enable or disable OIDC authentication |
+| admin-backend.env.OIDC_CLIENT_ID | string | `"environment-specific"` | Client ID for OIDC authentication (required if OIDC_AUTH_ENABLED="true") |
+| admin-backend.env.OIDC_CONFIGURATION_ENDPOINT | string | `"environment-specific"` | URL to fetch OIDC configuration (required if OIDC_AUTH_ENABLED="true") |
+| admin-backend.env.OIDC_ISSUER | string | `"environment-specific"` | OIDC issuer URL (required if OIDC_AUTH_ENABLED="true") |
+| admin-backend.env.OIDC_USERNAME_CLAIM | string | `"environment-specific"` | Specify claim used for the username extraction (required if OIDC_AUTH_ENABLED="true") |
 | admin-backend.env.PGVECTOR_DATABASE | string | `"environment-specific"` | Database name for PGVector |
 | admin-backend.env.PGVECTOR_HOST | string | `"environment-specific"` | Host for PGVector database |
 | admin-backend.env.PGVECTOR_PORT | string | `"environment-specific"` | Port for PGVector database |
@@ -123,6 +125,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-backend.image.repository | string | `"epam/statgpt-admin-backend"` | Image repository name |
 | admin-backend.image.tag | string | `"0.1.0"` | Image tag or version |
+| admin-backend.ingress | object | `{"annotations":{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"},"enabled":false,"ingressClassName":"nginx","path":"/admin/api"}` | Example for data related variables DATA_PORTAL_API_KEY: "example" ## Ingress Configuration ### ref: https://kubernetes.io/docs/concepts/services-networking/ingress/ |
 | admin-backend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-backend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | admin-backend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -153,10 +156,11 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | admin-backend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
 | admin-backend.resources.requests.memory | string | `"2Gi"` | Minimum memory request for resource scheduling |
+| admin-backend.secrets | object | `{}` |  |
 | admin-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | admin-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
 | admin-frontend.enabled | bool | `false` | Indicates whether the admin-frontend service is enabled |
-| admin-frontend.env.API_URL | string | `"environment-specific"` | API URL for admin backend |
+| admin-frontend.env.API_URL | string | `"environment-specific"` | API URL for admin-backend |
 | admin-frontend.env.DIAL_API_URL | string | `"environment-specific"` | DIAL API URL |
 | admin-frontend.env.NEXTAUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
 | admin-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
@@ -179,6 +183,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.resources.limits.memory | string | `"2Gi"` | Maximum memory limit for the container |
 | admin-frontend.resources.requests.cpu | string | `"500m"` | Minimum CPU request for resource scheduling |
 | admin-frontend.resources.requests.memory | string | `"0.5Gi"` | Minimum memory request for resource scheduling |
+| admin-frontend.secrets | object | `{}` |  |
 | chat-backend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | chat-backend.containerPorts.http | int | `5000` | HTTP port for the application |
 | chat-backend.enabled | bool | `false` | Indicates whether the chat-backend service is enabled |
@@ -211,6 +216,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | chat-backend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
 | chat-backend.resources.requests.memory | string | `"2Gi"` | Minimum memory request for resource scheduling |
+| chat-backend.secrets | object | `{}` |  |
 | elasticsearch.coordinating.replicaCount | int | `0` | Number of coordinating node replicas |
 | elasticsearch.data.replicaCount | int | `0` | Number of data node replicas |
 | elasticsearch.enabled | bool | `false` | Indicates whether the elasticsearch service is enabled |
@@ -226,11 +232,12 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | elasticsearch.master.resources.requests.cpu | string | `"500m"` | Minimum CPU request for resource scheduling |
 | elasticsearch.master.resources.requests.memory | string | `"0.5Gi"` | Minimum memory request for resource scheduling |
 | elasticsearch.metrics.image.repository | string | `"bitnamilegacy/elasticsearch-exporter"` | Fix: override deprecated repository with the updated one |
-| elasticsearch.security.enabled | bool | `false` | Enable security features |
+| elasticsearch.security.enabled | bool | `true` | Enable security features |
 | elasticsearch.security.tls | object | `{"autoGenerated":true}` | Auto-generate TLS certificates |
 | elasticsearch.sysctlImage.repository | string | `"bitnamilegacy/os-shell"` | Fix: override deprecated repository with the updated one |
 | elasticsearch.volumePermissions.image.repository | string | `"bitnamilegacy/os-shell"` | Fix: override deprecated repository with the updated one |
 | pgvector.auth.database | string | `"statgpt"` | Database name |
+| pgvector.auth.username | string | `"statgpt"` | Custom database username |
 | pgvector.enabled | bool | `false` | Indicates whether the pgvector service is enabled |
 | pgvector.image.registry | string | `"docker.io"` | Docker registry URL |
 | pgvector.image.repository | string | `"bitnamilegacy/postgresql"` | Image repository name |
@@ -250,9 +257,11 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | portal-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
 | portal-frontend.enabled | bool | `false` | Indicates whether the portal-frontend service is enabled |
+| portal-frontend.env.CONSTRAINS_SDMX_API_URL | string | `"environment-specific"` | SDMX Constrains API URL |
 | portal-frontend.env.DEFAULT_MODEL | string | `"environment-specific"` | Default model |
 | portal-frontend.env.DIAL_API_URL | string | `"environment-specific"` | DIAL API URL |
 | portal-frontend.env.DIAL_API_VERSION | string | `"environment-specific"` | DIAL API Version |
+| portal-frontend.env.NEXTAUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
 | portal-frontend.env.SDMX_API_URL | string | `"environment-specific"` | SDMX API URL |
 | portal-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | portal-frontend.image.registry | string | `"environment-specific"` | Docker registry URL (e.g., "docker.io") |
@@ -274,6 +283,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | portal-frontend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
 | portal-frontend.resources.requests.memory | string | `"0.5Gi"` | Minimum memory request for resource scheduling |
+| portal-frontend.secrets | object | `{}` |  |
 
 --------------------------------------------------
 Generated from chart metadata using [helm-docs](https://github.com/norwoodj/helm-docs): `docker run --rm --volume "$(pwd):/helm-docs" -u $(id -u) jnorwood/helm-docs:latest`

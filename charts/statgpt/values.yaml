@@ -110,19 +110,34 @@ chat-backend:
     # -- Index for Elasticsearch matching
     ELASTIC_MATCHING_INDEX: "environment-specific"
 
-    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
-    # DIAL_API_KEY: ""
-    # PGVECTOR_USER: ""
-    # PGVECTOR_PASSWORD: ""
-    # ELASTIC_AUTH_USER: ""
-    # ELASTIC_AUTH_PASSWORD: ""
-
-    ### DATA RELATED VARIABLES ###
+    ### Data Related Variables ###
     # Configure these variables based on the data uploaded to the application
     # Must be defined for both chat-backend and admin-backend
     # Example:
-    # DATA_PORTAL_URL: ""
-    # DATA_PORTAL_API_KEY: ""
+    # DATA_PORTAL_URL: "example"
+    # Note: DATA_PORTAL_API_KEY should be configured in secrets section below
+
+  ### Secrets Configuration ###
+  # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
+  # The secrets are automatically created and mounted by the dial-extension chart
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  secrets: {}
+    # Uncomment and configure the following secrets in your environment-specific values:
+    #
+    # -- DIAL API key for authentication
+    # DIAL_API_KEY: ""
+    # -- PGVector database username
+    # PGVECTOR_USER: ""
+    # -- PGVector database password
+    # PGVECTOR_PASSWORD: ""
+    # -- Elasticsearch authentication username
+    # ELASTIC_AUTH_USER: ""
+    # -- Elasticsearch authentication password
+    # ELASTIC_AUTH_PASSWORD: ""
+
+    ### Data Related Variables ###
+    # -- Example for data related variables
+    # DATA_PORTAL_API_KEY: "example"
 
 admin-backend:
   # -- Indicates whether the admin-backend service is enabled
@@ -217,26 +232,26 @@ admin-backend:
     WEB_CONCURRENCY: "1"
 
     # -- Enable or disable OIDC authentication
-    OIDC_AUTH_ENABLED: "environment-specific"  # Set to "true" to enable OIDC authentication
-    # -- URL to fetch OIDC configuration
-    OIDC_CONFIGURATION_ENDPOINT: "environment-specific"  # OIDC discovery endpoint
-    # -- Client ID for OIDC authentication
-    OIDC_CLIENT_ID: "environment-specific"  # Registered application client ID
-    # -- OIDC issuer URL
-    OIDC_ISSUER: "environment-specific"  # OIDC issuer URL
-    # -- Specify claim used for the username extraction
-    OIDC_USERNAME_CLAIM: "environment-specific"  # Claim from which to extract the username
-    # -- Claim used to identify user roles
-    ADMIN_ROLES_CLAIM: "environment-specific"  # Claim to extract admin roles from
-    # -- Values within the role claim that signify admin access
-    ADMIN_ROLES_VALUES: "environment-specific"  # Group ID representing admin roles
+    OIDC_AUTH_ENABLED: "true"
+    # -- URL to fetch OIDC configuration (required if OIDC_AUTH_ENABLED="true")
+    OIDC_CONFIGURATION_ENDPOINT: "environment-specific"
+    # -- Client ID for OIDC authentication (required if OIDC_AUTH_ENABLED="true")
+    OIDC_CLIENT_ID: "environment-specific"
+    # -- OIDC issuer URL (required if OIDC_AUTH_ENABLED="true")
+    OIDC_ISSUER: "environment-specific"
+    # -- Specify claim used for the username extraction (required if OIDC_AUTH_ENABLED="true")
+    OIDC_USERNAME_CLAIM: "environment-specific"
+    # -- Claim used to identify user roles (required if OIDC_AUTH_ENABLED="true")
+    ADMIN_ROLES_CLAIM: "environment-specific"
+    # -- Values within the role claim that signify admin access (required if OIDC_AUTH_ENABLED="true")
+    ADMIN_ROLES_VALUES: "environment-specific"
+
     # -- If "true", the admin portal will check for scopes in the OIDC token, otherwise this check will be skipped
-    ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED: "environment-specific"
-    ### SCOPE VALIDATION VARIABLES (only required when ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED is "true") ###
-    # The name of the custom access token field that contains scope information
-    # ADMIN_SCOPE_CLAIM: "environment-specific"
-    # Required scope claim value to get access to admin portal if scope claim validation is enabled
-    # ADMIN_SCOPE_VALUE: "environment-specific"
+    ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED: "true"
+    # -- Name of the access token field (required if OIDC_AUTH_ENABLED="true" and ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED="true")
+    ADMIN_SCOPE_CLAIM: "environment-specific"
+    # -- Scope claim value (required if OIDC_AUTH_ENABLED="true" and ADMIN_SCOPE_CLAIM_VALIDATION_ENABLED="true")
+    ADMIN_SCOPE_VALUE: "environment-specific"
 
     # -- URL for DIAL application
     DIAL_URL: "environment-specific"
@@ -253,19 +268,34 @@ admin-backend:
     # -- Index for Elasticsearch matching
     ELASTIC_MATCHING_INDEX: "environment-specific"
 
-    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
-    # DIAL_API_KEY: ""
-    # PGVECTOR_USER: ""
-    # PGVECTOR_PASSWORD: ""
-    # ELASTIC_AUTH_USER: ""
-    # ELASTIC_AUTH_PASSWORD: ""
-
-    ### DATA RELATED VARIABLES ###
+    ### Data Related Variables ###
     # Configure these variables based on the data uploaded to the application
     # Must be defined for both chat-backend and admin-backend
     # Example:
-    # DATA_PORTAL_URL: ""
-    # DATA_PORTAL_API_KEY: ""
+    # DATA_PORTAL_URL: "example"
+    # Note: DATA_PORTAL_API_KEY should be configured in secrets section below
+
+  ### Secrets Configuration ###
+  # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
+  # The secrets are automatically created and mounted by the dial-extension chart
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  secrets: {}
+    # Uncomment and configure the following secrets in your environment-specific values:
+    #
+    # -- DIAL API key for authentication
+    # DIAL_API_KEY: ""
+    # -- PGVector database username
+    # PGVECTOR_USER: ""
+    # -- PGVector database password
+    # PGVECTOR_PASSWORD: ""
+    # -- Elasticsearch authentication username
+    # ELASTIC_AUTH_USER: ""
+    # -- Elasticsearch authentication password
+    # ELASTIC_AUTH_PASSWORD: ""
+
+    ### Data Related Variables ###
+    # -- Example for data related variables
+    # DATA_PORTAL_API_KEY: "example"
 
   ### Ingress Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -353,34 +383,48 @@ admin-frontend:
   env:
     # -- DIAL API URL
     DIAL_API_URL: "environment-specific"
-    # -- API URL for admin backend
+    # -- API URL for admin-backend
     API_URL: "environment-specific"
     # -- URL for NextAuth service
     NEXTAUTH_URL: "environment-specific"
 
-    # Keycloak Identity Provider
+    ### Keycloak Identity Provider ###
     # -- Client ID for Keycloak
-    # AUTH_KEYCLOAK_CLIENT_ID: "environment-specific"
+    # AUTH_KEYCLOAK_CLIENT_ID: ""
     # -- URL for Keycloak
-    # AUTH_KEYCLOAK_HOST: "environment-specific"
+    # AUTH_KEYCLOAK_HOST: ""
 
-    # Azure Identity Provider
+    ### Azure Identity Provider ###
     # -- Azure AD Client ID for authentication
-    # AUTH_AZURE_AD_CLIENT_ID: "environment-specific"
+    # AUTH_AZURE_AD_CLIENT_ID: ""
     # -- Azure AD Application Name
-    # AUTH_AZURE_AD_NAME: "environment-specific"
+    # AUTH_AZURE_AD_NAME: ""
     # -- Azure Authority URL for authentication
-    # AUTH_AZURE_AUTHORITY_URL: "environment-specific"
+    # AUTH_AZURE_AUTHORITY_URL: ""
     # -- Azure AD Scopes for authentication
-    # AUTH_AZURE_AD_SCOPE: "environment-specific"
+    # AUTH_AZURE_AD_SCOPE: ""
     # -- Azure AD Tenant ID
-    # AUTH_AZURE_AD_TENANT_ID: "environment-specific"
+    # AUTH_AZURE_AD_TENANT_ID: ""
 
-    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+  ### Secrets Configuration ###
+  # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
+  # The secrets are automatically created and mounted by the dial-extension chart
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  secrets: {}
+    # Uncomment and configure the following secrets in your environment-specific values:
+    #
+    # -- DIAL API key for authentication
     # DIAL_API_KEY: ""
+    # -- Secret for NextAuth session encryption (can be generated with: openssl rand -base64 64)
     # NEXTAUTH_SECRET: ""
-    # AUTH_KEYCLOAK_SECRET: "" # Keycloak Identity Provider
-    # AUTH_AZURE_AD_SECRET: "" # Azure Identity Provider
+    #
+    ### Keycloak Identity Provider ###
+    # -- Keycloak client secret
+    # AUTH_KEYCLOAK_SECRET: ""
+    #
+    ### Azure Identity Provider ###
+    # -- Azure AD client secret
+    # AUTH_AZURE_AD_SECRET: ""
 
   ### Ingress Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -424,10 +468,17 @@ pgvector:
   auth:
     # -- Database name
     database: "statgpt"
+    # -- Custom database username
+    username: "statgpt"
 
-    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    ### Sensitive Credentials ###
+    # The following values are automatically converted to Kubernetes Secrets by the Bitnami PostgreSQL chart
+    # Chart template: https://github.com/bitnami/charts/blob/postgresql/15.5.5/bitnami/postgresql/templates/secrets.yaml
+    # Uncomment and configure in your environment-specific values:
+    #
+    # -- Password for the "postgres" admin user (stored as "postgres-password" in Secret)
     # postgresPassword: ""
-    # username: ""
+    # -- Password for the custom database user (stored as "password" in Secret)
     # password: ""
 
   # -- PostgreSQL shared preload libraries including pgaudit for auditing and vector for pgvector extension
@@ -595,12 +646,17 @@ elasticsearch:
 
   security:
     # -- Enable security features
-    enabled: false
+    enabled: true
     # -- Auto-generate TLS certificates
     tls:
       autoGenerated: true
 
-    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    ### Sensitive Credentials ###
+    # The elastic user password is stored in the main Kubernetes Secret
+    # Chart template: https://github.com/bitnami/charts/blob/elasticsearch/21.3.2/bitnami/elasticsearch/templates/secrets.yaml
+    # Uncomment and configure in your environment-specific values:
+    #
+    # -- Password for the "elastic" superuser (stored as "elasticsearch-password" in Secret)
     # elasticPassword: ""
 
 portal-frontend:
@@ -680,10 +736,34 @@ portal-frontend:
     DEFAULT_MODEL: "environment-specific"
     # -- SDMX API URL
     SDMX_API_URL: "environment-specific"
+    # -- SDMX Constrains API URL
+    CONSTRAINS_SDMX_API_URL: "environment-specific"
+    # -- URL for NextAuth service
+    NEXTAUTH_URL: "environment-specific"
 
-    ### SENSITIVE VARIABLES (configure via Kubernetes secrets) ###
+    ### Keycloak Identity Provider ###
+    # -- Client ID for Keycloak
+    # AUTH_KEYCLOAK_CLIENT_ID: ""
+    # -- URL for Keycloak
+    # AUTH_KEYCLOAK_HOST: ""
+
+  ### Secrets Configuration ###
+  # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
+  # The secrets are automatically created and mounted by the dial-extension chart
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  secrets: {}
+    # Uncomment and configure the following secrets in your environment-specific values:
+    #
+    # -- DIAL API key for authentication
     # DIAL_API_KEY: ""
+    # -- SDMX authentication key (required if SDMX API requires authentication)
     # SDMX_AUTH_KEY: ""
+    # -- Secret for NextAuth session encryption (can be generated with: openssl rand -base64 64)
+    # NEXTAUTH_SECRET: ""
+    #
+    ### Keycloak Identity Provider ###
+    # -- Keycloak client secret
+    # AUTH_KEYCLOAK_SECRET: ""
 
   ### Ingress Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
