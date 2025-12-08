@@ -1,7 +1,7 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.1.0"
+_backend_version: &backend_version "0.2.0"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.1.0"
+_admin_frontend_version: &admin_frontend_version "0.2.0"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
@@ -165,14 +165,9 @@ admin-backend:
     - name: alembic
       image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
       imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-      command:
-        - sh
-        - '-c'
-        - >-
-          alembic -c $APP_HOME/alembic.ini upgrade head
       env:
-        - name: "APP_HOME"
-          value: "/home/app"
+        - name: "ADMIN_MODE"
+          value: "INIT"
         - name: "PGVECTOR_HOST"
           value: "{{ .Values.env.PGVECTOR_HOST}}"
         - name: "PGVECTOR_PORT"
@@ -674,7 +669,7 @@ portal-frontend:
     registry: "environment-specific"
     # -- Image repository name (e.g., "epam/statgpt-global-trusted-data-commons")
     repository: "environment-specific"
-    # -- Image tag or version (e.g., "0.1.0")
+    # -- Image tag or version (e.g., "0.1.1")
     tag: "environment-specific"
     # -- Image pull policy
     pullPolicy: Always
