@@ -48,6 +48,8 @@ chat-backend:
   livenessProbe:
     # -- Enable livenessProbe
     enabled: true
+    # -- Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during PostgreSQL initialization)
+    initialDelaySeconds: 180
 
   ### Readiness Probes configuration ###
   # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes

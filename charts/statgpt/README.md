@@ -204,6 +204,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.image.repository | string | `"epam/statgpt-chat-backend"` | Image repository name |
 | chat-backend.image.tag | string | `"0.2.0"` | Image tag or version |
 | chat-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| chat-backend.livenessProbe.initialDelaySeconds | int | `180` | Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during PostgreSQL initialization) |
 | chat-backend.metrics.enabled | bool | `false` | Enable metrics collection |
 | chat-backend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
 | chat-backend.podSecurityContext.enabled | bool | `true` | Enable security context for the pod |
