@@ -1,7 +1,7 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.2.0"
+_backend_version: &backend_version "0.3.0"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.2.0"
+_admin_frontend_version: &admin_frontend_version "0.2.5"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
@@ -82,8 +82,6 @@ chat-backend:
   env:
     # -- Name of the DIAL app for OpenTelemetry
     DIAL_APP_NAME: "StatGPT"
-    # -- Authentication mode for DIAL
-    DIAL_AUTH_MODE: "user_token"
     # -- Show debug stages in DIAL
     DIAL_SHOW_DEBUG_STAGES: "false"
     # -- Show stage seconds in DIAL
@@ -671,7 +669,7 @@ portal-frontend:
     registry: "environment-specific"
     # -- Image repository name (e.g., "epam/statgpt-global-trusted-data-commons")
     repository: "environment-specific"
-    # -- Image tag or version (e.g., "0.1.1")
+    # -- Image tag or version (e.g., "0.1.2")
     tag: "environment-specific"
     # -- Image pull policy
     pullPolicy: Always
