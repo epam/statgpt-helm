@@ -731,8 +731,8 @@ portal-frontend:
     DEFAULT_MODEL: "environment-specific"
     # -- SDMX API URL
     SDMX_API_URL: "environment-specific"
-    # -- SDMX Constrains API URL
-    CONSTRAINS_SDMX_API_URL: "environment-specific"
+    # -- SDMX Constraints API URL (optional)
+    # CONSTRAINS_SDMX_API_URL: "environment-specific"
     # -- URL for NextAuth service
     NEXTAUTH_URL: "environment-specific"
 
