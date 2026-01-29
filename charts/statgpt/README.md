@@ -254,7 +254,6 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | portal-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
 | portal-frontend.enabled | bool | `false` | Indicates whether the portal-frontend service is enabled |
-| portal-frontend.env.CONSTRAINS_SDMX_API_URL | string | `"environment-specific"` | SDMX Constrains API URL |
 | portal-frontend.env.DEFAULT_MODEL | string | `"environment-specific"` | Default model |
 | portal-frontend.env.DIAL_API_URL | string | `"environment-specific"` | DIAL API URL |
 | portal-frontend.env.DIAL_API_VERSION | string | `"environment-specific"` | DIAL API Version |
