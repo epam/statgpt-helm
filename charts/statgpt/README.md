@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.0.10](https://img.shields.io/badge/Version-1.0.10-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -94,10 +94,11 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| _admin_frontend_version | string | `"0.2.5"` | Admin Frontend version is used for the admin-frontend image tag |
-| _backend_version | string | `"0.3.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
+| _admin_frontend_version | string | `"0.3.0"` | Admin Frontend version is used for the admin-frontend image tag |
+| _backend_version | string | `"0.4.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
+| _portal-frontend_version | string | `"0.2.0"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
 | admin-backend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | admin-backend.containerPorts.http | int | `8000` | HTTP port for the application |
@@ -120,11 +121,12 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.env.PGVECTOR_DATABASE | string | `"environment-specific"` | Database name for PGVector |
 | admin-backend.env.PGVECTOR_HOST | string | `"environment-specific"` | Host for PGVector database |
 | admin-backend.env.PGVECTOR_PORT | string | `"environment-specific"` | Port for PGVector database |
+| admin-backend.env.PGVECTOR_USE_MSI | string | `"false"` | Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD) |
 | admin-backend.env.WEB_CONCURRENCY | string | `"1"` | Number of concurrent web processes |
 | admin-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-backend.image.repository | string | `"epam/statgpt-admin-backend"` | Image repository name |
-| admin-backend.image.tag | string | `"0.3.0"` | Image tag or version |
+| admin-backend.image.tag | string | `"0.4.0"` | Image tag or version |
 | admin-backend.ingress | object | `{"annotations":{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"},"enabled":false,"ingressClassName":"nginx","path":"/admin/api"}` | Example for data related variables DATA_PORTAL_API_KEY: "example" ## Ingress Configuration ### ref: https://kubernetes.io/docs/concepts/services-networking/ingress/ |
 | admin-backend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-backend.ingress.enabled | bool | `false` | Enable Ingress resource |
@@ -138,10 +140,12 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.initContainers[0].env[2].value | string | `"{{ .Values.env.PGVECTOR_PORT }}"` |  |
 | admin-backend.initContainers[0].env[3].name | string | `"PGVECTOR_DATABASE"` |  |
 | admin-backend.initContainers[0].env[3].value | string | `"{{ .Values.env.PGVECTOR_DATABASE }}"` |  |
-| admin-backend.initContainers[0].env[4].name | string | `"PGVECTOR_USER"` |  |
-| admin-backend.initContainers[0].env[4].value | string | `"{{ .Values.secrets.PGVECTOR_USER }}"` |  |
-| admin-backend.initContainers[0].env[5].name | string | `"PGVECTOR_PASSWORD"` |  |
-| admin-backend.initContainers[0].env[5].value | string | `"{{ .Values.secrets.PGVECTOR_PASSWORD }}"` |  |
+| admin-backend.initContainers[0].env[4].name | string | `"PGVECTOR_USE_MSI"` |  |
+| admin-backend.initContainers[0].env[4].value | string | `"{{ .Values.env.PGVECTOR_USE_MSI }}"` |  |
+| admin-backend.initContainers[0].env[5].name | string | `"PGVECTOR_USER"` |  |
+| admin-backend.initContainers[0].env[5].value | string | `"{{ .Values.secrets.PGVECTOR_USER }}"` |  |
+| admin-backend.initContainers[0].env[6].name | string | `"PGVECTOR_PASSWORD"` |  |
+| admin-backend.initContainers[0].env[6].value | string | `"{{ .Values.secrets.PGVECTOR_PASSWORD }}"` |  |
 | admin-backend.initContainers[0].image | string | `"{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"` |  |
 | admin-backend.initContainers[0].imagePullPolicy | string | `"{{ .Values.image.pullPolicy }}"` |  |
 | admin-backend.initContainers[0].name | string | `"alembic"` |  |
@@ -150,7 +154,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
 | admin-backend.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
 | admin-backend.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
-| admin-backend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
+| admin-backend.resources.limits.memory | string | `"6Gi"` | Maximum memory limit for the container |
 | admin-backend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
 | admin-backend.resources.requests.memory | string | `"2Gi"` | Minimum memory request for resource scheduling |
 | admin-backend.secrets | object | `{}` |  |
@@ -163,7 +167,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-frontend.image.repository | string | `"epam/statgpt-admin-frontend"` | Image repository name |
-| admin-frontend.image.tag | string | `"0.2.5"` | Image tag or version |
+| admin-frontend.image.tag | string | `"0.3.0"` | Image tag or version |
 | admin-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | admin-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -177,7 +181,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.readinessProbe.httpGet | object | `{"path":"/api/health"}` | HTTP GET request configuration for liveness probe |
 | admin-frontend.readinessProbe.httpGet.path | string | `"/api/health"` | Health check endpoint path |
 | admin-frontend.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
-| admin-frontend.resources.limits.memory | string | `"2Gi"` | Maximum memory limit for the container |
+| admin-frontend.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
 | admin-frontend.resources.requests.cpu | string | `"500m"` | Minimum CPU request for resource scheduling |
 | admin-frontend.resources.requests.memory | string | `"0.5Gi"` | Minimum memory request for resource scheduling |
 | admin-frontend.secrets | object | `{}` |  |
@@ -197,11 +201,12 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.env.PGVECTOR_DATABASE | string | `"environment-specific"` | Database name for PGVector |
 | chat-backend.env.PGVECTOR_HOST | string | `"environment-specific"` | Host for PGVector database |
 | chat-backend.env.PGVECTOR_PORT | string | `"environment-specific"` | Port for PGVector database |
+| chat-backend.env.PGVECTOR_USE_MSI | string | `"false"` | Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD) |
 | chat-backend.env.WEB_CONCURRENCY | string | `"1"` | Number of concurrent web processes |
 | chat-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | chat-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | chat-backend.image.repository | string | `"epam/statgpt-chat-backend"` | Image repository name |
-| chat-backend.image.tag | string | `"0.3.0"` | Image tag or version |
+| chat-backend.image.tag | string | `"0.4.0"` | Image tag or version |
 | chat-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | chat-backend.livenessProbe.initialDelaySeconds | int | `180` | Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during PostgreSQL initialization) |
 | chat-backend.metrics.enabled | bool | `false` | Enable metrics collection |
@@ -260,9 +265,9 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.env.NEXTAUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
 | portal-frontend.env.SDMX_API_URL | string | `"environment-specific"` | SDMX API URL |
 | portal-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
-| portal-frontend.image.registry | string | `"environment-specific"` | Docker registry URL (e.g., "docker.io") |
-| portal-frontend.image.repository | string | `"environment-specific"` | Image repository name (e.g., "epam/statgpt-global-trusted-data-commons") |
-| portal-frontend.image.tag | string | `"environment-specific"` | Image tag or version (e.g., "0.1.2") |
+| portal-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
+| portal-frontend.image.repository | string | `"epam/statgpt-global-trusted-data-commons"` | Image repository name |
+| portal-frontend.image.tag | string | `"0.2.0"` | Image tag or version |
 | portal-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | portal-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | portal-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |

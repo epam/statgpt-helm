@@ -1,7 +1,9 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.3.0"
+_backend_version: &backend_version "0.4.0"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.2.5"
+_admin_frontend_version: &admin_frontend_version "0.3.0"
+# -- Portal Frontend version is used for the portal-frontend image tag
+_portal-frontend_version: &portal-frontend_version "0.2.0"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
@@ -103,6 +105,8 @@ chat-backend:
     PGVECTOR_PORT: "environment-specific"
     # -- Database name for PGVector
     PGVECTOR_DATABASE: "environment-specific"
+    # -- Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD)
+    PGVECTOR_USE_MSI: "false"
     # -- Connection string for Elasticsearch
     ELASTIC_CONNECTION_STRING: "environment-specific"
     # -- Index for Elasticsearch indicators
@@ -174,6 +178,9 @@ admin-backend:
           value: "{{ .Values.env.PGVECTOR_PORT }}"
         - name: "PGVECTOR_DATABASE"
           value: "{{ .Values.env.PGVECTOR_DATABASE }}"
+        # When PGVECTOR_USE_MSI is "true", Managed Identity is used and PGVECTOR_PASSWORD is not required
+        - name: "PGVECTOR_USE_MSI"
+          value: "{{ .Values.env.PGVECTOR_USE_MSI }}"
         # Configuration via Kubernetes secrets is required
         - name: "PGVECTOR_USER"
           value: "{{ .Values.secrets.PGVECTOR_USER }}"
@@ -205,7 +212,7 @@ admin-backend:
       # -- Maximum CPU limit for the container
       cpu: "1000m"
       # -- Maximum memory limit for the container
-      memory: "4Gi"
+      memory: "6Gi"
     requests:
       # -- Minimum CPU request for resource scheduling
       cpu: "100m"
@@ -256,6 +263,8 @@ admin-backend:
     PGVECTOR_PORT: "environment-specific"
     # -- Database name for PGVector
     PGVECTOR_DATABASE: "environment-specific"
+    # -- Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD)
+    PGVECTOR_USE_MSI: "false"
     # -- Connection string for Elasticsearch
     ELASTIC_CONNECTION_STRING: "environment-specific"
     # -- Index for Elasticsearch indicators
@@ -360,7 +369,7 @@ admin-frontend:
       # -- Maximum CPU limit for the container
       cpu: "1000m"
       # -- Maximum memory limit for the container
-      memory: "2Gi"
+      memory: "4Gi"
     requests:
       # -- Minimum CPU request for resource scheduling
       cpu: "500m"
@@ -665,12 +674,12 @@ portal-frontend:
   ### Container Image Configuration ###
   # ref: https://kubernetes.io/docs/concepts/containers/images/
   image:
-    # -- Docker registry URL (e.g., "docker.io")
-    registry: "environment-specific"
-    # -- Image repository name (e.g., "epam/statgpt-global-trusted-data-commons")
-    repository: "environment-specific"
-    # -- Image tag or version (e.g., "0.1.2")
-    tag: "environment-specific"
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: epam/statgpt-global-trusted-data-commons
+    # -- Image tag or version
+    tag: *portal-frontend_version
     # -- Image pull policy
     pullPolicy: Always
 
