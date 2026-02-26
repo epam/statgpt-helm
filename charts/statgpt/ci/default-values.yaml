@@ -74,7 +74,7 @@ pgvector:
   primary:
     resources:
       limits:
-        cpu: "1"
+        cpu: "1000m"
         memory: "1Gi"
       requests:
         cpu: "250m"
@@ -89,14 +89,14 @@ elasticsearch:
   enabled: true
   fullnameOverride: "statgpt-elasticsearch"
   master:
-    heapSize: 128m
+    heapSize: 512m
     resources:
       limits:
-        cpu: "500m"
-        memory: "0.5Gi"
+        cpu: "1000m"
+        memory: "1Gi"
       requests:
         cpu: "250m"
-        memory: "0.25Gi"
+        memory: "0.5Gi"
   security:
     enabled: true
     elasticPassword: *ELASTIC_AUTH_PASSWORD
