@@ -198,12 +198,20 @@ admin-backend:
   livenessProbe:
     # -- Enable livenessProbe
     enabled: true
+    # -- Timeout in seconds for the liveness probe
+    timeoutSeconds: 10
+    # -- Number of consecutive failures before the pod is restarted
+    failureThreshold: 10
 
   ### Readiness Probes configuration ###
   # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   readinessProbe:
     # -- Enable readinessProbe
     enabled: true
+    # -- Timeout in seconds for the readiness probe
+    timeoutSeconds: 10
+    # -- Number of consecutive failures before the pod is marked as not ready
+    failureThreshold: 10
 
   ### Resource Management ###
   # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
