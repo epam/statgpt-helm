@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -150,9 +150,13 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.initContainers[0].imagePullPolicy | string | `"{{ .Values.image.pullPolicy }}"` |  |
 | admin-backend.initContainers[0].name | string | `"alembic"` |  |
 | admin-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| admin-backend.livenessProbe.failureThreshold | int | `10` | Number of consecutive failures before the pod is restarted |
+| admin-backend.livenessProbe.timeoutSeconds | int | `10` | Timeout in seconds for the liveness probe |
 | admin-backend.metrics.enabled | bool | `false` | Enable metrics collection |
 | admin-backend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
 | admin-backend.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
+| admin-backend.readinessProbe.failureThreshold | int | `10` | Number of consecutive failures before the pod is marked as not ready |
+| admin-backend.readinessProbe.timeoutSeconds | int | `10` | Timeout in seconds for the readiness probe |
 | admin-backend.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
 | admin-backend.resources.limits.memory | string | `"6Gi"` | Maximum memory limit for the container |
 | admin-backend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
