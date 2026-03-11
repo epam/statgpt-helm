@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.1.3](https://img.shields.io/badge/Version-1.1.3-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -100,6 +100,17 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
 | _portal-frontend_version | string | `"0.2.2"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
+| admin-backend.autoUpdateCronJob.backoffLimit | int | `2` | Number of retries before considering a Job as failed |
+| admin-backend.autoUpdateCronJob.concurrencyPolicy | string | `"Forbid"` | ConcurrencyPolicy: Forbid, Allow, or Replace |
+| admin-backend.autoUpdateCronJob.enabled | bool | `false` | Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels) |
+| admin-backend.autoUpdateCronJob.failedJobsHistoryLimit | int | `3` | Number of failed finished jobs to retain |
+| admin-backend.autoUpdateCronJob.resources.limits.cpu | string | `"500m"` | Maximum CPU limit for the auto-update job |
+| admin-backend.autoUpdateCronJob.resources.limits.memory | string | `"1Gi"` | Maximum memory limit for the auto-update job |
+| admin-backend.autoUpdateCronJob.resources.requests.cpu | string | `"100m"` | Minimum CPU request for the auto-update job |
+| admin-backend.autoUpdateCronJob.resources.requests.memory | string | `"512Mi"` | Minimum memory request for the auto-update job |
+| admin-backend.autoUpdateCronJob.schedule | string | `"0 0 * * *"` | Cron schedule (default: once a day at midnight) |
+| admin-backend.autoUpdateCronJob.successfulJobsHistoryLimit | int | `3` | Number of successful finished jobs to retain |
+| admin-backend.autoUpdateCronJob.ttlSecondsAfterFinished | int | `3600` | Seconds after a Job finishes (success or failure) before it is automatically deleted. Set to null to rely only on history limits |
 | admin-backend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | admin-backend.containerPorts.http | int | `8000` | HTTP port for the application |
 | admin-backend.enabled | bool | `false` | Indicates whether the admin-backend service is enabled |
@@ -120,6 +131,8 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.env.OIDC_USERNAME_CLAIM | string | `"environment-specific"` | Specify claim used for the username extraction (required if OIDC_AUTH_ENABLED="true") |
 | admin-backend.env.PGVECTOR_DATABASE | string | `"environment-specific"` | Database name for PGVector |
 | admin-backend.env.PGVECTOR_HOST | string | `"environment-specific"` | Host for PGVector database |
+| admin-backend.env.PGVECTOR_MSI_SCOPE | string | `"https://ossrdbms-aad.database.windows.net/.default"` | MSI scope for Azure PostgreSQL (used when PGVECTOR_USE_MSI is "true") |
+| admin-backend.env.PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT | string | `"86400"` | MSI token refresh timeout in seconds (used when PGVECTOR_USE_MSI is "true") |
 | admin-backend.env.PGVECTOR_PORT | string | `"environment-specific"` | Port for PGVector database |
 | admin-backend.env.PGVECTOR_USE_MSI | string | `"false"` | Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD) |
 | admin-backend.env.WEB_CONCURRENCY | string | `"1"` | Number of concurrent web processes |
@@ -142,10 +155,14 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.initContainers[0].env[3].value | string | `"{{ .Values.env.PGVECTOR_DATABASE }}"` |  |
 | admin-backend.initContainers[0].env[4].name | string | `"PGVECTOR_USE_MSI"` |  |
 | admin-backend.initContainers[0].env[4].value | string | `"{{ .Values.env.PGVECTOR_USE_MSI }}"` |  |
-| admin-backend.initContainers[0].env[5].name | string | `"PGVECTOR_USER"` |  |
-| admin-backend.initContainers[0].env[5].value | string | `"{{ .Values.secrets.PGVECTOR_USER }}"` |  |
-| admin-backend.initContainers[0].env[6].name | string | `"PGVECTOR_PASSWORD"` |  |
-| admin-backend.initContainers[0].env[6].value | string | `"{{ .Values.secrets.PGVECTOR_PASSWORD }}"` |  |
+| admin-backend.initContainers[0].env[5].name | string | `"PGVECTOR_MSI_SCOPE"` |  |
+| admin-backend.initContainers[0].env[5].value | string | `"{{ .Values.env.PGVECTOR_MSI_SCOPE }}"` |  |
+| admin-backend.initContainers[0].env[6].name | string | `"PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT"` |  |
+| admin-backend.initContainers[0].env[6].value | string | `"{{ .Values.env.PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT }}"` |  |
+| admin-backend.initContainers[0].env[7].name | string | `"PGVECTOR_USER"` |  |
+| admin-backend.initContainers[0].env[7].value | string | `"{{ .Values.secrets.PGVECTOR_USER }}"` |  |
+| admin-backend.initContainers[0].env[8].name | string | `"PGVECTOR_PASSWORD"` |  |
+| admin-backend.initContainers[0].env[8].value | string | `"{{ .Values.secrets.PGVECTOR_PASSWORD }}"` |  |
 | admin-backend.initContainers[0].image | string | `"{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"` |  |
 | admin-backend.initContainers[0].imagePullPolicy | string | `"{{ .Values.image.pullPolicy }}"` |  |
 | admin-backend.initContainers[0].name | string | `"alembic"` |  |
@@ -204,6 +221,8 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.env.LANGCHAIN_VERBOSE | string | `"false"` | Enable verbose logging for Langchain |
 | chat-backend.env.PGVECTOR_DATABASE | string | `"environment-specific"` | Database name for PGVector |
 | chat-backend.env.PGVECTOR_HOST | string | `"environment-specific"` | Host for PGVector database |
+| chat-backend.env.PGVECTOR_MSI_SCOPE | string | `"https://ossrdbms-aad.database.windows.net/.default"` | MSI scope for Azure PostgreSQL (used when PGVECTOR_USE_MSI is "true") |
+| chat-backend.env.PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT | string | `"86400"` | MSI token refresh timeout in seconds (used when PGVECTOR_USE_MSI is "true") |
 | chat-backend.env.PGVECTOR_PORT | string | `"environment-specific"` | Port for PGVector database |
 | chat-backend.env.PGVECTOR_USE_MSI | string | `"false"` | Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD) |
 | chat-backend.env.WEB_CONCURRENCY | string | `"1"` | Number of concurrent web processes |

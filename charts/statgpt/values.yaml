@@ -107,6 +107,10 @@ chat-backend:
     PGVECTOR_DATABASE: "environment-specific"
     # -- Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD)
     PGVECTOR_USE_MSI: "false"
+    # -- MSI scope for Azure PostgreSQL (used when PGVECTOR_USE_MSI is "true")
+    PGVECTOR_MSI_SCOPE: "https://ossrdbms-aad.database.windows.net/.default"
+    # -- MSI token refresh timeout in seconds (used when PGVECTOR_USE_MSI is "true")
+    PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT: "86400" # 24 hours
     # -- Connection string for Elasticsearch
     ELASTIC_CONNECTION_STRING: "environment-specific"
     # -- Index for Elasticsearch indicators
@@ -163,6 +167,35 @@ admin-backend:
     # -- Image pull policy
     pullPolicy: Always
 
+  ### CronJob Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
+  autoUpdateCronJob:
+    # -- Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels)
+    enabled: false # Note: this is a pre-release feature and does not work with *backend_version. Use the development tag instead
+    # -- Cron schedule (default: once a day at midnight)
+    schedule: "0 0 * * *"
+    # -- ConcurrencyPolicy: Forbid, Allow, or Replace
+    concurrencyPolicy: Forbid
+    # -- Number of successful finished jobs to retain
+    successfulJobsHistoryLimit: 3
+    # -- Number of failed finished jobs to retain
+    failedJobsHistoryLimit: 3
+    # -- Number of retries before considering a Job as failed
+    backoffLimit: 2
+    # -- Seconds after a Job finishes (success or failure) before it is automatically deleted. Set to null to rely only on history limits
+    ttlSecondsAfterFinished: 3600
+    resources:
+      limits:
+        # -- Maximum CPU limit for the auto-update job
+        cpu: "500m"
+        # -- Maximum memory limit for the auto-update job
+        memory: "1Gi"
+      requests:
+        # -- Minimum CPU request for the auto-update job
+        cpu: "100m"
+        # -- Minimum memory request for the auto-update job
+        memory: "512Mi"
+
   ### Init Containers Configuration ###
   # ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
   initContainers:
@@ -181,6 +214,10 @@ admin-backend:
         # When PGVECTOR_USE_MSI is "true", Managed Identity is used and PGVECTOR_PASSWORD is not required
         - name: "PGVECTOR_USE_MSI"
           value: "{{ .Values.env.PGVECTOR_USE_MSI }}"
+        - name: "PGVECTOR_MSI_SCOPE"
+          value: "{{ .Values.env.PGVECTOR_MSI_SCOPE }}"
+        - name: "PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT"
+          value: "{{ .Values.env.PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT }}"
         # Configuration via Kubernetes secrets is required
         - name: "PGVECTOR_USER"
           value: "{{ .Values.secrets.PGVECTOR_USER }}"
@@ -273,6 +310,10 @@ admin-backend:
     PGVECTOR_DATABASE: "environment-specific"
     # -- Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of PGVECTOR_PASSWORD)
     PGVECTOR_USE_MSI: "false"
+    # -- MSI scope for Azure PostgreSQL (used when PGVECTOR_USE_MSI is "true")
+    PGVECTOR_MSI_SCOPE: "https://ossrdbms-aad.database.windows.net/.default"
+    # -- MSI token refresh timeout in seconds (used when PGVECTOR_USE_MSI is "true")
+    PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT: "86400" # 24 hours
     # -- Connection string for Elasticsearch
     ELASTIC_CONNECTION_STRING: "environment-specific"
     # -- Index for Elasticsearch indicators
