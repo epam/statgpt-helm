@@ -110,7 +110,7 @@ chat-backend:
     # -- MSI scope for Azure PostgreSQL (used when PGVECTOR_USE_MSI is "true")
     PGVECTOR_MSI_SCOPE: "https://ossrdbms-aad.database.windows.net/.default"
     # -- MSI token refresh timeout in seconds (used when PGVECTOR_USE_MSI is "true")
-    PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT: "86400" # 24 hours
+    PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT: "86400"  # 24 hours
     # -- Connection string for Elasticsearch
     ELASTIC_CONNECTION_STRING: "environment-specific"
     # -- Index for Elasticsearch indicators
@@ -171,7 +171,7 @@ admin-backend:
   # ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
   autoUpdateCronJob:
     # -- Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels)
-    enabled: false # Note: this is a pre-release feature and does not work with *backend_version. Use the development tag instead
+    enabled: false  # Note: this is a pre-release feature and does not work with *backend_version. Use the development tag instead
     # -- Cron schedule (default: once a day at midnight)
     schedule: "0 0 * * *"
     # -- ConcurrencyPolicy: Forbid, Allow, or Replace
@@ -313,7 +313,7 @@ admin-backend:
     # -- MSI scope for Azure PostgreSQL (used when PGVECTOR_USE_MSI is "true")
     PGVECTOR_MSI_SCOPE: "https://ossrdbms-aad.database.windows.net/.default"
     # -- MSI token refresh timeout in seconds (used when PGVECTOR_USE_MSI is "true")
-    PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT: "86400" # 24 hours
+    PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT: "86400"  # 24 hours
     # -- Connection string for Elasticsearch
     ELASTIC_CONNECTION_STRING: "environment-specific"
     # -- Index for Elasticsearch indicators
