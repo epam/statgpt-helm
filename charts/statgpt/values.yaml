@@ -189,14 +189,14 @@ admin-backend:
     resources:
       limits:
         # -- Maximum CPU limit for the auto-update job
-        cpu: "500m"
+        cpu: "1000m"
         # -- Maximum memory limit for the auto-update job
-        memory: "1Gi"
+        memory: "6Gi"
       requests:
         # -- Minimum CPU request for the auto-update job
         cpu: "100m"
         # -- Minimum memory request for the auto-update job
-        memory: "512Mi"
+        memory: "2Gi"
 
   ### Init Containers Configuration ###
   # ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/

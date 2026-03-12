@@ -47,5 +47,5 @@ spec:
                     name: {{ $secretName | quote }}
               {{- end }}
               resources:
-                {{- toYaml ($cron.resources | default (dict "limits" (dict "cpu" "500m" "memory" "1Gi") "requests" (dict "cpu" "100m" "memory" "512Mi"))) | nindent 16 }}
+                {{- toYaml ($cron.resources | default (dict "limits" (dict "cpu" "1000m" "memory" "6Gi") "requests" (dict "cpu" "100m" "memory" "2Gi"))) | nindent 16 }}
 {{- end }}
