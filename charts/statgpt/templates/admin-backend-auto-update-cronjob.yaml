@@ -32,11 +32,9 @@ spec:
               env:
                 - name: ADMIN_MODE
                   value: "AUTO_UPDATE"
-                {{- $envVars := list "PGVECTOR_HOST" "PGVECTOR_PORT" "PGVECTOR_DATABASE" "PGVECTOR_USE_MSI" "PGVECTOR_MSI_SCOPE" "PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT" }}
-                {{- range $envVars }}
-                {{- $val := index $adminBackend.env . }}
-                {{- if $val }}
-                - name: {{ . }}
+                {{- range $key, $val := $adminBackend.env }}
+                {{- if ne $key "ADMIN_MODE" }}
+                - name: {{ $key }}
                   value: {{ $val | quote }}
                 {{- end }}
                 {{- end }}
