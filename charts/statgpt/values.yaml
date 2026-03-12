@@ -172,6 +172,8 @@ admin-backend:
   autoUpdateCronJob:
     # -- Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels)
     enabled: false  # Note: this is a pre-release feature and does not work with *backend_version. Use the development tag instead
+    # -- Existing Secret name. If set, CronJob loads secrets from it via envFrom. If unset, CronJob uses the Secret created by admin-backend from admin-backend.secrets
+    existingSecret: ""
     # -- Cron schedule (default: once a day at midnight)
     schedule: "0 0 * * *"
     # -- ConcurrencyPolicy: Forbid, Allow, or Replace
@@ -220,9 +222,15 @@ admin-backend:
           value: "{{ .Values.env.PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT }}"
         # Configuration via Kubernetes secrets is required
         - name: "PGVECTOR_USER"
-          value: "{{ .Values.secrets.PGVECTOR_USER }}"
+          valueFrom:
+            secretKeyRef:
+              name: '{{ template "dialExtension.names.fullname" . }}'  # admin-backend Secret (dial-extension chart)
+              key: PGVECTOR_USER
         - name: "PGVECTOR_PASSWORD"
-          value: "{{ .Values.secrets.PGVECTOR_PASSWORD }}"
+          valueFrom:
+            secretKeyRef:
+              name: '{{ template "dialExtension.names.fullname" . }}'  # admin-backend Secret (dial-extension chart)
+              key: PGVECTOR_PASSWORD
 
   ### Container Port Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/service/

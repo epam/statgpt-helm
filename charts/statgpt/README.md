@@ -103,6 +103,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.autoUpdateCronJob.backoffLimit | int | `2` | Number of retries before considering a Job as failed |
 | admin-backend.autoUpdateCronJob.concurrencyPolicy | string | `"Forbid"` | ConcurrencyPolicy: Forbid, Allow, or Replace |
 | admin-backend.autoUpdateCronJob.enabled | bool | `false` | Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels) |
+| admin-backend.autoUpdateCronJob.existingSecret | string | `""` | Existing Secret name. If set, CronJob loads secrets from it via envFrom. If unset, CronJob uses the Secret created by admin-backend from admin-backend.secrets |
 | admin-backend.autoUpdateCronJob.failedJobsHistoryLimit | int | `3` | Number of failed finished jobs to retain |
 | admin-backend.autoUpdateCronJob.resources.limits.cpu | string | `"500m"` | Maximum CPU limit for the auto-update job |
 | admin-backend.autoUpdateCronJob.resources.limits.memory | string | `"1Gi"` | Maximum memory limit for the auto-update job |
@@ -160,9 +161,11 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.initContainers[0].env[6].name | string | `"PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT"` |  |
 | admin-backend.initContainers[0].env[6].value | string | `"{{ .Values.env.PGVECTOR_MSI_TOKEN_REFRESH_TIMEOUT }}"` |  |
 | admin-backend.initContainers[0].env[7].name | string | `"PGVECTOR_USER"` |  |
-| admin-backend.initContainers[0].env[7].value | string | `"{{ .Values.secrets.PGVECTOR_USER }}"` |  |
+| admin-backend.initContainers[0].env[7].valueFrom.secretKeyRef.key | string | `"PGVECTOR_USER"` |  |
+| admin-backend.initContainers[0].env[7].valueFrom.secretKeyRef.name | string | `"{{ template \"dialExtension.names.fullname\" . }}"` |  |
 | admin-backend.initContainers[0].env[8].name | string | `"PGVECTOR_PASSWORD"` |  |
-| admin-backend.initContainers[0].env[8].value | string | `"{{ .Values.secrets.PGVECTOR_PASSWORD }}"` |  |
+| admin-backend.initContainers[0].env[8].valueFrom.secretKeyRef.key | string | `"PGVECTOR_PASSWORD"` |  |
+| admin-backend.initContainers[0].env[8].valueFrom.secretKeyRef.name | string | `"{{ template \"dialExtension.names.fullname\" . }}"` |  |
 | admin-backend.initContainers[0].image | string | `"{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"` |  |
 | admin-backend.initContainers[0].imagePullPolicy | string | `"{{ .Values.image.pullPolicy }}"` |  |
 | admin-backend.initContainers[0].name | string | `"alembic"` |  |

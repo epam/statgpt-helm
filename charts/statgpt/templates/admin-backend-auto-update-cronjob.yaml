@@ -25,6 +25,9 @@ spec:
             {{- include "common.labels.standard" (dict "customLabels" $adminBackend.commonLabels "context" $) | nindent 12 }}
         spec:
           restartPolicy: OnFailure
+          {{- $abFullname := $adminBackend.fullnameOverride | default (printf "%s-admin-backend" .Release.Name) }}
+          {{- $hasSecrets := or $cron.existingSecret (and ($adminBackend.secrets) (ne (len ($adminBackend.secrets | default dict)) 0)) }}
+          {{- $secretName := $cron.existingSecret | default $abFullname }}
           containers:
             - name: auto-update
               image: "{{ $adminBackend.image.registry }}/{{ $adminBackend.image.repository }}:{{ $adminBackend.image.tag }}"
@@ -38,14 +41,11 @@ spec:
                   value: {{ $val | quote }}
                 {{- end }}
                 {{- end }}
-                {{- $secretVars := list "PGVECTOR_USER" "PGVECTOR_PASSWORD" }}
-                {{- range $secretVars }}
-                {{- $val := index ($adminBackend.secrets | default dict) . }}
-                {{- if $val }}
-                - name: {{ . }}
-                  value: {{ $val | quote }}
-                {{- end }}
-                {{- end }}
+              {{- if $hasSecrets }}
+              envFrom:
+                - secretRef:
+                    name: {{ $secretName | quote }}
+              {{- end }}
               resources:
                 {{- toYaml ($cron.resources | default (dict "limits" (dict "cpu" "500m" "memory" "1Gi") "requests" (dict "cpu" "100m" "memory" "512Mi"))) | nindent 16 }}
 {{- end }}
