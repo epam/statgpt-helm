@@ -1,0 +1,51 @@
+{{- $adminBackend := index .Values "admin-backend" }}
+{{- $cron := index $adminBackend "autoUpdateCronJob" | default dict }}
+{{- if and $adminBackend.enabled $cron.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ (printf "%s-auto-update" ($adminBackend.fullnameOverride | default (printf "%s-admin-backend" .Release.Name))) }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "common.labels.standard" (dict "customLabels" $adminBackend.commonLabels "context" $) | nindent 4 }}
+spec:
+  schedule: {{ $cron.schedule | default "0 0 * * *" | quote }}
+  concurrencyPolicy: {{ $cron.concurrencyPolicy | default "Forbid" }}
+  successfulJobsHistoryLimit: {{ $cron.successfulJobsHistoryLimit | default 3 }}
+  failedJobsHistoryLimit: {{ $cron.failedJobsHistoryLimit | default 3 }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ $cron.backoffLimit | default 2 }}
+      {{- if ne $cron.ttlSecondsAfterFinished nil }}
+      ttlSecondsAfterFinished: {{ int $cron.ttlSecondsAfterFinished }}
+      {{- end }}
+      template:
+        metadata:
+          labels:
+            {{- include "common.labels.standard" (dict "customLabels" $adminBackend.commonLabels "context" $) | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          {{- $abFullname := $adminBackend.fullnameOverride | default (printf "%s-admin-backend" .Release.Name) }}
+          {{- $hasSecrets := or $cron.existingSecret (and ($adminBackend.secrets) (ne (len ($adminBackend.secrets | default dict)) 0)) }}
+          {{- $secretName := $cron.existingSecret | default $abFullname }}
+          containers:
+            - name: auto-update
+              image: "{{ $adminBackend.image.registry }}/{{ $adminBackend.image.repository }}:{{ $adminBackend.image.tag }}"
+              imagePullPolicy: "{{ $adminBackend.image.pullPolicy }}"
+              env:
+                - name: ADMIN_MODE
+                  value: "AUTO_UPDATE"
+                {{- range $key, $val := $adminBackend.env }}
+                {{- if ne $key "ADMIN_MODE" }}
+                - name: {{ $key }}
+                  value: {{ $val | quote }}
+                {{- end }}
+                {{- end }}
+              {{- if $hasSecrets }}
+              envFrom:
+                - secretRef:
+                    name: {{ $secretName | quote }}
+              {{- end }}
+              resources:
+                {{- toYaml ($cron.resources | default (dict "limits" (dict "cpu" "1000m" "memory" "6Gi") "requests" (dict "cpu" "100m" "memory" "2Gi"))) | nindent 16 }}
+{{- end }}
