@@ -95,20 +95,20 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | _admin_frontend_version | string | `"0.3.0"` | Admin Frontend version is used for the admin-frontend image tag |
-| _backend_version | string | `"0.4.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
+| _backend_version | string | `"0.5.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
-| _portal-frontend_version | string | `"0.2.2"` | Portal Frontend version is used for the portal-frontend image tag |
+| _portal-frontend_version | string | `"0.3.0"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
 | admin-backend.autoUpdateCronJob.backoffLimit | int | `2` | Number of retries before considering a Job as failed |
 | admin-backend.autoUpdateCronJob.concurrencyPolicy | string | `"Forbid"` | ConcurrencyPolicy: Forbid, Allow, or Replace |
 | admin-backend.autoUpdateCronJob.enabled | bool | `false` | Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels) |
 | admin-backend.autoUpdateCronJob.existingSecret | string | `""` | Existing Secret name. If set, CronJob loads secrets from it via envFrom. If unset, CronJob uses the Secret created by admin-backend from admin-backend.secrets |
 | admin-backend.autoUpdateCronJob.failedJobsHistoryLimit | int | `3` | Number of failed finished jobs to retain |
-| admin-backend.autoUpdateCronJob.resources.limits.cpu | string | `"500m"` | Maximum CPU limit for the auto-update job |
-| admin-backend.autoUpdateCronJob.resources.limits.memory | string | `"1Gi"` | Maximum memory limit for the auto-update job |
+| admin-backend.autoUpdateCronJob.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the auto-update job |
+| admin-backend.autoUpdateCronJob.resources.limits.memory | string | `"6Gi"` | Maximum memory limit for the auto-update job |
 | admin-backend.autoUpdateCronJob.resources.requests.cpu | string | `"100m"` | Minimum CPU request for the auto-update job |
-| admin-backend.autoUpdateCronJob.resources.requests.memory | string | `"512Mi"` | Minimum memory request for the auto-update job |
+| admin-backend.autoUpdateCronJob.resources.requests.memory | string | `"2Gi"` | Minimum memory request for the auto-update job |
 | admin-backend.autoUpdateCronJob.schedule | string | `"0 0 * * *"` | Cron schedule (default: once a day at midnight) |
 | admin-backend.autoUpdateCronJob.successfulJobsHistoryLimit | int | `3` | Number of successful finished jobs to retain |
 | admin-backend.autoUpdateCronJob.ttlSecondsAfterFinished | int | `3600` | Seconds after a Job finishes (success or failure) before it is automatically deleted. Set to null to rely only on history limits |
@@ -140,7 +140,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-backend.image.repository | string | `"epam/statgpt-admin-backend"` | Image repository name |
-| admin-backend.image.tag | string | `"0.4.0"` | Image tag or version |
+| admin-backend.image.tag | string | `"0.5.0"` | Image tag or version |
 | admin-backend.ingress | object | `{"annotations":{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"},"enabled":false,"ingressClassName":"nginx","path":"/admin/api"}` | Example for data related variables DATA_PORTAL_API_KEY: "example" ## Ingress Configuration ### ref: https://kubernetes.io/docs/concepts/services-networking/ingress/ |
 | admin-backend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-backend.ingress.enabled | bool | `false` | Enable Ingress resource |
@@ -232,7 +232,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | chat-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | chat-backend.image.repository | string | `"epam/statgpt-chat-backend"` | Image repository name |
-| chat-backend.image.tag | string | `"0.4.0"` | Image tag or version |
+| chat-backend.image.tag | string | `"0.5.0"` | Image tag or version |
 | chat-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | chat-backend.livenessProbe.initialDelaySeconds | int | `180` | Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during PostgreSQL initialization) |
 | chat-backend.metrics.enabled | bool | `false` | Enable metrics collection |
@@ -293,7 +293,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | portal-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | portal-frontend.image.repository | string | `"epam/statgpt-global-trusted-data-commons"` | Image repository name |
-| portal-frontend.image.tag | string | `"0.2.2"` | Image tag or version |
+| portal-frontend.image.tag | string | `"0.3.0"` | Image tag or version |
 | portal-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | portal-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | portal-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
