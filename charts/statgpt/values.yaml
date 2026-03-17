@@ -3,7 +3,7 @@ _backend_version: &backend_version "0.5.0"
 # -- Admin Frontend version is used for the admin-frontend image tag
 _admin_frontend_version: &admin_frontend_version "0.3.0"
 # -- Portal Frontend version is used for the portal-frontend image tag
-_portal-frontend_version: &portal-frontend_version "0.3.0"
+_portal-frontend_version: &portal-frontend_version "0.3.1"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
