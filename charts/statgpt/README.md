@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -98,7 +98,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | _backend_version | string | `"0.5.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
-| _portal-frontend_version | string | `"0.3.0"` | Portal Frontend version is used for the portal-frontend image tag |
+| _portal-frontend_version | string | `"0.3.1"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
 | admin-backend.autoUpdateCronJob.backoffLimit | int | `2` | Number of retries before considering a Job as failed |
 | admin-backend.autoUpdateCronJob.concurrencyPolicy | string | `"Forbid"` | ConcurrencyPolicy: Forbid, Allow, or Replace |
@@ -293,7 +293,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | portal-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | portal-frontend.image.repository | string | `"epam/statgpt-global-trusted-data-commons"` | Image repository name |
-| portal-frontend.image.tag | string | `"0.3.0"` | Image tag or version |
+| portal-frontend.image.tag | string | `"0.3.1"` | Image tag or version |
 | portal-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | portal-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | portal-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
