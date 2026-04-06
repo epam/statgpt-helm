@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.2.2](https://img.shields.io/badge/Version-1.2.2-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -19,10 +19,12 @@ Kubernetes: `>=1.23.0-0`
 | https://charts.bitnami.com/bitnami | common | 2.14.1 |
 | https://charts.bitnami.com/bitnami | elasticsearch(elasticsearch) | 21.3.2 |
 | https://charts.bitnami.com/bitnami | pgvector(postgresql) | 15.5.5 |
-| https://charts.epam-rail.com | chat-backend(dial-extension) | 1.3.2 |
-| https://charts.epam-rail.com | admin-backend(dial-extension) | 1.3.2 |
-| https://charts.epam-rail.com | admin-frontend(dial-extension) | 1.3.2 |
-| https://charts.epam-rail.com | portal-frontend(dial-extension) | 1.3.2 |
+| https://charts.dialx.ai | chat-backend(dial-extension) | 1.3.2 |
+| https://charts.dialx.ai | admin-backend(dial-extension) | 1.3.2 |
+| https://charts.dialx.ai | admin-frontend(dial-extension) | 1.3.2 |
+| https://charts.dialx.ai | portal-frontend(dial-extension) | 1.3.2 |
+| https://charts.dialx.ai | sdmx-proxy(dial-extension) | 1.3.2 |
+| https://charts.dialx.ai | sdmx-proxy-config-server(dial-extension) | 1.3.2 |
 
 ## Validating the Chart
 
@@ -95,11 +97,12 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | _admin_frontend_version | string | `"0.3.1"` | Admin Frontend version is used for the admin-frontend image tag |
-| _backend_version | string | `"0.5.1"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
+| _backend_version | string | `"0.6.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
 | _portal-frontend_version | string | `"0.3.2"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
+| _sdmx_proxy_version | string | `"0.1.0"` | SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both) |
 | admin-backend.autoUpdateCronJob.backoffLimit | int | `2` | Number of retries before considering a Job as failed |
 | admin-backend.autoUpdateCronJob.concurrencyPolicy | string | `"Forbid"` | ConcurrencyPolicy: Forbid, Allow, or Replace |
 | admin-backend.autoUpdateCronJob.enabled | bool | `false` | Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels) |
@@ -140,7 +143,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-backend.image.repository | string | `"epam/statgpt-admin-backend"` | Image repository name |
-| admin-backend.image.tag | string | `"0.5.1"` | Image tag or version |
+| admin-backend.image.tag | string | `"0.6.0"` | Image tag or version |
 | admin-backend.ingress | object | `{"annotations":{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"},"enabled":false,"ingressClassName":"nginx","path":"/admin/api"}` | Example for data related variables DATA_PORTAL_API_KEY: "example" ## Ingress Configuration ### ref: https://kubernetes.io/docs/concepts/services-networking/ingress/ |
 | admin-backend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-backend.ingress.enabled | bool | `false` | Enable Ingress resource |
@@ -232,7 +235,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | chat-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | chat-backend.image.repository | string | `"epam/statgpt-chat-backend"` | Image repository name |
-| chat-backend.image.tag | string | `"0.5.1"` | Image tag or version |
+| chat-backend.image.tag | string | `"0.6.0"` | Image tag or version |
 | chat-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | chat-backend.livenessProbe.initialDelaySeconds | int | `180` | Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during PostgreSQL initialization) |
 | chat-backend.metrics.enabled | bool | `false` | Enable metrics collection |
@@ -311,6 +314,60 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.resources.requests.cpu | string | `"100m"` | Minimum CPU request for resource scheduling |
 | portal-frontend.resources.requests.memory | string | `"0.5Gi"` | Minimum memory request for resource scheduling |
 | portal-frontend.secrets | object | `{}` |  |
+| sdmx-proxy-config-server.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
+| sdmx-proxy-config-server.containerPorts.http | int | `8060` | HTTP port for the application |
+| sdmx-proxy-config-server.enabled | bool | `false` | Indicates whether the sdmx-proxy-config-server service is enabled |
+| sdmx-proxy-config-server.env.CONFIG_SERVER_SOURCE_CONFIG_PATH | string | `"environment-specific"` | Config Server Source Config Path |
+| sdmx-proxy-config-server.env.CONFIG_SERVER_SOURCE_TYPE | string | `"DIAL_STORAGE"` | Config Server Source Type |
+| sdmx-proxy-config-server.env.DIAL_STORAGE_BASE_URL | string | `"environment-specific"` | DIAL API URL |
+| sdmx-proxy-config-server.image.pullPolicy | string | `"Always"` | Image pull policy |
+| sdmx-proxy-config-server.image.registry | string | `"docker.io"` | Docker registry URL |
+| sdmx-proxy-config-server.image.repository | string | `"epam/statgpt-sdmx-proxy-config-server"` | Image repository name |
+| sdmx-proxy-config-server.image.tag | string | `"0.1.0"` | Image tag or version |
+| sdmx-proxy-config-server.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
+| sdmx-proxy-config-server.ingress.enabled | bool | `false` | Enable Ingress resource |
+| sdmx-proxy-config-server.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
+| sdmx-proxy-config-server.ingress.path | string | `"/"` | Path for the Ingress resource |
+| sdmx-proxy-config-server.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| sdmx-proxy-config-server.livenessProbe.httpGet | object | `{"path":"/health"}` | HTTP GET request configuration for liveness probe |
+| sdmx-proxy-config-server.livenessProbe.httpGet.path | string | `"/health"` | Health check endpoint path |
+| sdmx-proxy-config-server.metrics.enabled | bool | `false` | Enable metrics collection |
+| sdmx-proxy-config-server.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
+| sdmx-proxy-config-server.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
+| sdmx-proxy-config-server.readinessProbe.httpGet | object | `{"path":"/health"}` | HTTP GET request configuration for liveness probe |
+| sdmx-proxy-config-server.readinessProbe.httpGet.path | string | `"/health"` | Health check endpoint path |
+| sdmx-proxy-config-server.resources.limits.cpu | string | `"1000m"` | Maximum CPU limit for the container |
+| sdmx-proxy-config-server.resources.limits.memory | string | `"2Gi"` | Maximum memory limit for the container |
+| sdmx-proxy-config-server.resources.requests.cpu | string | `"500m"` | Minimum CPU request for resource scheduling |
+| sdmx-proxy-config-server.resources.requests.memory | string | `"1Gi"` | Minimum memory request for resource scheduling |
+| sdmx-proxy-config-server.secrets | object | `{}` |  |
+| sdmx-proxy.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
+| sdmx-proxy.containerPorts.http | int | `8050` | HTTP port for the application |
+| sdmx-proxy.enabled | bool | `false` | Indicates whether the sdmx-proxy service is enabled |
+| sdmx-proxy.env.SDMXPROXY_REGISTRY_CONFIG_SOURCE_CONFIGSERVER_POLLINTERVAL | string | `"PT180S"` | Poll interval for config server updates (ISO-8601 duration format) |
+| sdmx-proxy.env.SDMXPROXY_REGISTRY_CONFIG_SOURCE_CONFIGSERVER_URL | string | `"environment-specific"` | API URL for sdmx-proxy-config-server |
+| sdmx-proxy.env.SDMXPROXY_REGISTRY_CONFIG_SOURCE_TYPE | string | `"CONFIG_SERVER"` | SDMX Proxy Registry Type |
+| sdmx-proxy.image.pullPolicy | string | `"Always"` | Image pull policy |
+| sdmx-proxy.image.registry | string | `"docker.io"` | Docker registry URL |
+| sdmx-proxy.image.repository | string | `"epam/statgpt-sdmx-proxy"` | Image repository name |
+| sdmx-proxy.image.tag | string | `"0.1.0"` | Image tag or version |
+| sdmx-proxy.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
+| sdmx-proxy.ingress.enabled | bool | `false` | Enable Ingress resource |
+| sdmx-proxy.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
+| sdmx-proxy.ingress.path | string | `"/"` | Path for the Ingress resource |
+| sdmx-proxy.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| sdmx-proxy.livenessProbe.httpGet | object | `{"path":"/statgpt/sdmx-proxy/api/v0/health"}` | HTTP GET request configuration for liveness probe |
+| sdmx-proxy.livenessProbe.httpGet.path | string | `"/statgpt/sdmx-proxy/api/v0/health"` | Health check endpoint path |
+| sdmx-proxy.metrics.enabled | bool | `false` | Enable metrics collection |
+| sdmx-proxy.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
+| sdmx-proxy.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
+| sdmx-proxy.readinessProbe.httpGet | object | `{"path":"/statgpt/sdmx-proxy/api/v0/health"}` | HTTP GET request configuration for liveness probe |
+| sdmx-proxy.readinessProbe.httpGet.path | string | `"/statgpt/sdmx-proxy/api/v0/health"` | Health check endpoint path |
+| sdmx-proxy.resources.limits.cpu | string | `"2000m"` | Maximum CPU limit for the container |
+| sdmx-proxy.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
+| sdmx-proxy.resources.requests.cpu | string | `"1000m"` | Minimum CPU request for resource scheduling |
+| sdmx-proxy.resources.requests.memory | string | `"2Gi"` | Minimum memory request for resource scheduling |
+| sdmx-proxy.secrets | object | `{}` |  |
 
 --------------------------------------------------
 Generated from chart metadata using [helm-docs](https://github.com/norwoodj/helm-docs): `docker run --rm --volume "$(pwd):/helm-docs" -u $(id -u) jnorwood/helm-docs:latest`
