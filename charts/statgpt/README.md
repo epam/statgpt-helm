@@ -292,7 +292,6 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.env.DIAL_API_URL | string | `"environment-specific"` | DIAL API URL |
 | portal-frontend.env.DIAL_API_VERSION | string | `"environment-specific"` | DIAL API Version |
 | portal-frontend.env.NEXTAUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
-| portal-frontend.env.SDMX_API_URL | string | `"environment-specific"` | SDMX API URL |
 | portal-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | portal-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | portal-frontend.image.repository | string | `"epam/statgpt-global-trusted-data-commons"` | Image repository name |
