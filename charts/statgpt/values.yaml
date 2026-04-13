@@ -798,7 +798,7 @@ portal-frontend:
     # -- Default model
     DEFAULT_MODEL: "environment-specific"
     # -- SDMX API URL
-    SDMX_API_URL: "environment-specific"
+    # SDMX_API_URL: "environment-specific"
     # -- SDMX Constraints API URL (optional)
     # CONSTRAINS_SDMX_API_URL: "environment-specific"
     # -- API URL for sdmx-proxy (optional). Requires sdmx-proxy to be enabled
