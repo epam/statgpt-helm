@@ -1,11 +1,11 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.7.0"
+_backend_version: &backend_version "0.8.1"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.3.1"
+_admin_frontend_version: &admin_frontend_version "0.3.2"
 # -- Portal Frontend version is used for the portal-frontend image tag
-_portal-frontend_version: &portal-frontend_version "0.4.2"
+_portal-frontend_version: &portal-frontend_version "0.4.3"
 # -- SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both)
-_sdmx_proxy_version: &sdmx_proxy_version "0.1.4"
+_sdmx_proxy_version: &sdmx_proxy_version "0.1.6"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
@@ -428,12 +428,12 @@ admin-frontend:
       # -- Maximum CPU limit for the container
       cpu: "1000m"
       # -- Maximum memory limit for the container
-      memory: "4Gi"
+      memory: "6Gi"
     requests:
       # -- Minimum CPU request for resource scheduling
       cpu: "500m"
       # -- Minimum memory request for resource scheduling
-      memory: "0.5Gi"
+      memory: "1Gi"
 
   metrics:
     # -- Enable metrics collection
@@ -1027,10 +1027,12 @@ sdmx-proxy-config-server:
     CONFIG_SERVER_SOURCE_TYPE: "DIAL_STORAGE"
 
     ### if SDMX Proxy Registry Type is DIAL_STORAGE ###
-    # -- DIAL API URL
-    DIAL_STORAGE_BASE_URL: "environment-specific"
     # -- Config Server Source Config Path
     CONFIG_SERVER_SOURCE_CONFIG_PATH: "environment-specific"
+    # -- Force sdmx-proxy-config-server to overwrite stored DIAL Storage config from the bundled default on startup
+    CONFIG_SERVER_FORCE_SEED: "false"
+    # -- DIAL API URL
+    DIAL_STORAGE_BASE_URL: "environment-specific"
 
   ### Secrets Configuration ###
   # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
