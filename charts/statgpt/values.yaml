@@ -120,6 +120,11 @@ chat-backend:
     # -- Index for Elasticsearch matching
     ELASTIC_MATCHING_INDEX: "environment-specific"
 
+    # -- Disable direct tool calls
+    ENABLE_DIRECT_TOOL_CALLS: "false"
+    # -- Disable development commands
+    ENABLE_DEV_COMMANDS: "false"
+
     ### Data Related Variables ###
     # Configure these variables based on the data uploaded to the application
     # Must be defined for both chat-backend and admin-backend
