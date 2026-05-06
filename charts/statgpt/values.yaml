@@ -90,6 +90,10 @@ chat-backend:
     DIAL_SHOW_DEBUG_STAGES: "false"
     # -- Show stage seconds in DIAL
     DIAL_SHOW_STAGE_SECONDS: "false"
+    # -- Disable direct tool calls
+    ENABLE_DIRECT_TOOL_CALLS: "false"
+    # -- Disable development commands
+    ENABLE_DEV_COMMANDS: "false"
     # -- Number of concurrent web processes
     WEB_CONCURRENCY: "1"
     # -- Enable verbose logging for Langchain
@@ -119,11 +123,6 @@ chat-backend:
     ELASTIC_INDICATORS_INDEX: "environment-specific"
     # -- Index for Elasticsearch matching
     ELASTIC_MATCHING_INDEX: "environment-specific"
-
-    # -- Disable direct tool calls
-    ENABLE_DIRECT_TOOL_CALLS: "false"
-    # -- Disable development commands
-    ENABLE_DEV_COMMANDS: "false"
 
     ### Data Related Variables ###
     # Configure these variables based on the data uploaded to the application
