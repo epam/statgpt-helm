@@ -1,7 +1,7 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
 _backend_version: &backend_version "0.8.1"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.3.2"
+_admin_frontend_version: &admin_frontend_version "0.3.3"
 # -- Portal Frontend version is used for the portal-frontend image tag
 _portal-frontend_version: &portal-frontend_version "0.4.3"
 # -- SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both)
