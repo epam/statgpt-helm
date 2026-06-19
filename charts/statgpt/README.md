@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.10.0](https://img.shields.io/badge/Version-1.10.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.11.0](https://img.shields.io/badge/Version-1.11.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -19,12 +19,12 @@ Kubernetes: `>=1.23.0-0`
 | https://charts.bitnami.com/bitnami | common | 2.14.1 |
 | https://charts.bitnami.com/bitnami | elasticsearch(elasticsearch) | 21.3.2 |
 | https://charts.bitnami.com/bitnami | pgvector(postgresql) | 15.5.5 |
-| https://charts.dialx.ai | chat-backend(dial-extension) | 1.3.2 |
-| https://charts.dialx.ai | admin-backend(dial-extension) | 1.3.2 |
-| https://charts.dialx.ai | admin-frontend(dial-extension) | 1.3.2 |
-| https://charts.dialx.ai | portal-frontend(dial-extension) | 1.3.2 |
-| https://charts.dialx.ai | sdmx-proxy(dial-extension) | 1.3.2 |
-| https://charts.dialx.ai | sdmx-proxy-config-server(dial-extension) | 1.3.2 |
+| https://charts.dialx.ai | chat-backend(dial-extension) | 3.1.1 |
+| https://charts.dialx.ai | admin-backend(dial-extension) | 3.1.1 |
+| https://charts.dialx.ai | admin-frontend(dial-extension) | 3.1.1 |
+| https://charts.dialx.ai | portal-frontend(dial-extension) | 3.1.1 |
+| https://charts.dialx.ai | sdmx-proxy(dial-extension) | 3.1.1 |
+| https://charts.dialx.ai | sdmx-proxy-config-server(dial-extension) | 3.1.1 |
 
 ## Validating the Chart
 
@@ -280,10 +280,10 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | pgvector.primary.extraVolumes | list | `[{"emptyDir":{},"name":"postgresql-files"}]` | Shared volume for storing complete PostgreSQL directories with pgvector extension |
 | pgvector.primary.initContainers | list | `[{"command":["/bin/bash","-c","set -e\necho \"=== Setting up PostgreSQL with pgvector extension ===\"\n\nPGVECTOR_VERSION=\"{{ .Values.pgvectorVersion }}\"\necho \"Installing pgvector version: $PGVECTOR_VERSION\"\n\n# Create directory structure in shared volume\nmkdir -p /shared/postgresql-files/lib /shared/postgresql-files/share\n\n# Copy entire existing PostgreSQL directories to preserve all libraries and extensions\necho \"Copying existing PostgreSQL directories...\"\ncp -r /opt/bitnami/postgresql/lib/* /shared/postgresql-files/lib/\ncp -r /opt/bitnami/postgresql/share/* /shared/postgresql-files/share/\n\n# Install build dependencies for compiling pgvector\necho \"Installing build dependencies...\"\ninstall_packages git build-essential\n\n# Clone and build pgvector from source\necho \"Building pgvector extension version $PGVECTOR_VERSION...\"\ncd /tmp\ngit clone --branch \"$PGVECTOR_VERSION\" https://github.com/pgvector/pgvector.git\ncd pgvector\nexport PG_CONFIG=/opt/bitnami/postgresql/bin/pg_config\nmake clean && make\n\n# Add compiled pgvector files to the copied PostgreSQL directories\necho \"Installing pgvector files...\"\ncp vector.so /shared/postgresql-files/lib/\ncp sql/vector--*.sql /shared/postgresql-files/share/extension/\ncp vector.control /shared/postgresql-files/share/extension/\n\n# Set proper ownership for Bitnami PostgreSQL user\nchown -R 1001:1001 /shared\n\n# Verify installation\necho \"Verifying pgvector installation...\"\nls -la /shared/postgresql-files/lib/vector.so\nls -la /shared/postgresql-files/share/extension/vector.control\n\necho \"=== pgvector $PGVECTOR_VERSION setup completed successfully ===\"\n"],"image":"{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}","name":"setup-pgvector","securityContext":{"runAsNonRoot":false,"runAsUser":0},"volumeMounts":[{"mountPath":"/shared","name":"postgresql-files"}]}]` | Build and install pgvector extension by copying existing PostgreSQL directories and adding pgvector files |
 | pgvector.primary.initdb | object | `{"scripts":{"01_create_extension.sh":"#!/bin/sh\nset -e\n\nexport PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD\n\necho \"=== Creating the vector extension in the database ===\"\npsql -U postgres -d $POSTGRES_DATABASE -c \"CREATE EXTENSION IF NOT EXISTS vector;\"\n\necho \"Currently installed extensions:\"\npsql -U postgres -d $POSTGRES_DATABASE -c \"\\dx\"\n\necho \"=== The vector extension has been successfully created in the database ===\"\n"}}` | Database initialization scripts to create the vector extension after PostgreSQL startup |
-| pgvector.primary.resources.limits.cpu | string | `"4000m"` | Maximum CPU limit for the container |
-| pgvector.primary.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
-| pgvector.primary.resources.requests.cpu | string | `"2000m"` | Minimum CPU request for resource scheduling |
-| pgvector.primary.resources.requests.memory | string | `"2Gi"` | Minimum memory request for resource scheduling |
+| pgvector.primary.resources.limits.cpu | string | `"2000m"` | Maximum CPU limit for the container |
+| pgvector.primary.resources.limits.memory | string | `"2Gi"` | Maximum memory limit for the container |
+| pgvector.primary.resources.requests.cpu | string | `"1000m"` | Minimum CPU request for resource scheduling |
+| pgvector.primary.resources.requests.memory | string | `"1Gi"` | Minimum memory request for resource scheduling |
 | pgvector.volumePermissions.image.repository | string | `"bitnamilegacy/os-shell"` | Fix: override deprecated repository with the updated one |
 | portal-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | portal-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
