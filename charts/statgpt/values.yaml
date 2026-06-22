@@ -554,14 +554,14 @@ pgvector:
     resources:
       limits:
         # -- Maximum CPU limit for the container
-        cpu: "4000m"
+        cpu: "2000m"
         # -- Maximum memory limit for the container
-        memory: "4Gi"
+        memory: "2Gi"
       requests:
         # -- Minimum CPU request for resource scheduling
-        cpu: "2000m"
+        cpu: "1000m"
         # -- Minimum memory request for resource scheduling
-        memory: "2Gi"
+        memory: "1Gi"
 
     # -- Build and install pgvector extension by copying existing PostgreSQL directories and adding pgvector files
     initContainers:
