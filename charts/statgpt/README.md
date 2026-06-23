@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.11.0](https://img.shields.io/badge/Version-1.11.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.12.0](https://img.shields.io/badge/Version-1.12.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -96,13 +96,13 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| _admin_frontend_version | string | `"0.4.1"` | Admin Frontend version is used for the admin-frontend image tag |
-| _backend_version | string | `"0.11.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
+| _admin_frontend_version | string | `"0.4.2"` | Admin Frontend version is used for the admin-frontend image tag |
+| _backend_version | string | `"0.12.0"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
-| _portal-frontend_version | string | `"0.6.1"` | Portal Frontend version is used for the portal-frontend image tag |
+| _portal-frontend_version | string | `"0.6.2"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
-| _sdmx_proxy_version | string | `"0.3.1"` | SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both) |
+| _sdmx_proxy_version | string | `"0.4.0"` | SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both) |
 | admin-backend.autoUpdateCronJob.backoffLimit | int | `2` | Number of retries before considering a Job as failed |
 | admin-backend.autoUpdateCronJob.concurrencyPolicy | string | `"Forbid"` | ConcurrencyPolicy: Forbid, Allow, or Replace |
 | admin-backend.autoUpdateCronJob.enabled | bool | `false` | Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels) |
@@ -143,7 +143,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-backend.image.repository | string | `"epam/statgpt-admin-backend"` | Image repository name |
-| admin-backend.image.tag | string | `"0.11.0"` | Image tag or version |
+| admin-backend.image.tag | string | `"0.12.0"` | Image tag or version |
 | admin-backend.ingress | object | `{"annotations":{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"},"enabled":false,"ingressClassName":"nginx","path":"/admin/api"}` | Example for data related variables DATA_PORTAL_API_KEY: "example" ## Ingress Configuration ### ref: https://kubernetes.io/docs/concepts/services-networking/ingress/ |
 | admin-backend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-backend.ingress.enabled | bool | `false` | Enable Ingress resource |
@@ -189,12 +189,13 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
 | admin-frontend.enabled | bool | `false` | Indicates whether the admin-frontend service is enabled |
 | admin-frontend.env.API_URL | string | `"environment-specific"` | API URL for admin-backend |
+| admin-frontend.env.AUTH_TRUST_HOST | string | `"true"` | Trust the host header from a reverse proxy or ingress (set to "false" for local/direct access) |
+| admin-frontend.env.AUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
 | admin-frontend.env.DIAL_API_URL | string | `"environment-specific"` | DIAL API URL |
-| admin-frontend.env.NEXTAUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
 | admin-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-frontend.image.repository | string | `"epam/statgpt-admin-frontend"` | Image repository name |
-| admin-frontend.image.tag | string | `"0.4.1"` | Image tag or version |
+| admin-frontend.image.tag | string | `"0.4.2"` | Image tag or version |
 | admin-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | admin-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -235,7 +236,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | chat-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | chat-backend.image.repository | string | `"epam/statgpt-chat-backend"` | Image repository name |
-| chat-backend.image.tag | string | `"0.11.0"` | Image tag or version |
+| chat-backend.image.tag | string | `"0.12.0"` | Image tag or version |
 | chat-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | chat-backend.livenessProbe.initialDelaySeconds | int | `180` | Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during PostgreSQL initialization) |
 | chat-backend.metrics.enabled | bool | `false` | Enable metrics collection |
@@ -288,14 +289,17 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | portal-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
 | portal-frontend.enabled | bool | `false` | Indicates whether the portal-frontend service is enabled |
+| portal-frontend.env.AUTH_TRUST_HOST | string | `"true"` | Trust the host header from a reverse proxy or ingress (set to "false" for local/direct access) |
+| portal-frontend.env.AUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
+| portal-frontend.env.CROSS_DATASET_MODE | string | `"false"` | Enable cross-dataset mode to allow viewing, filtering, and configuring grid views across multiple datasets |
 | portal-frontend.env.DEFAULT_MODEL | string | `"environment-specific"` | Default model |
 | portal-frontend.env.DIAL_API_URL | string | `"environment-specific"` | DIAL API URL |
 | portal-frontend.env.DIAL_API_VERSION | string | `"environment-specific"` | DIAL API Version |
-| portal-frontend.env.NEXTAUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
+| portal-frontend.env.INFO_BANNER_MESSAGE | string | `"version: {{ .Values.image.tag }}"` | Markdown message displayed in the informational banner below the footer (leave empty to hide) |
 | portal-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | portal-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | portal-frontend.image.repository | string | `"epam/statgpt-global-trusted-data-commons"` | Image repository name |
-| portal-frontend.image.tag | string | `"0.6.1"` | Image tag or version |
+| portal-frontend.image.tag | string | `"0.6.2"` | Image tag or version |
 | portal-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | portal-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | portal-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -323,7 +327,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | sdmx-proxy-config-server.image.pullPolicy | string | `"Always"` | Image pull policy |
 | sdmx-proxy-config-server.image.registry | string | `"docker.io"` | Docker registry URL |
 | sdmx-proxy-config-server.image.repository | string | `"epam/statgpt-sdmx-proxy-config-server"` | Image repository name |
-| sdmx-proxy-config-server.image.tag | string | `"0.3.1"` | Image tag or version |
+| sdmx-proxy-config-server.image.tag | string | `"0.4.0"` | Image tag or version |
 | sdmx-proxy-config-server.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | sdmx-proxy-config-server.livenessProbe.httpGet | object | `{"path":"/health"}` | HTTP GET request configuration for liveness probe |
 | sdmx-proxy-config-server.livenessProbe.httpGet.path | string | `"/health"` | Health check endpoint path |
@@ -346,7 +350,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | sdmx-proxy.image.pullPolicy | string | `"Always"` | Image pull policy |
 | sdmx-proxy.image.registry | string | `"docker.io"` | Docker registry URL |
 | sdmx-proxy.image.repository | string | `"epam/statgpt-sdmx-proxy"` | Image repository name |
-| sdmx-proxy.image.tag | string | `"0.3.1"` | Image tag or version |
+| sdmx-proxy.image.tag | string | `"0.4.0"` | Image tag or version |
 | sdmx-proxy.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | sdmx-proxy.ingress.enabled | bool | `false` | Enable Ingress resource |
 | sdmx-proxy.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
