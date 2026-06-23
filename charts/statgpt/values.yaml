@@ -1,11 +1,11 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.11.0"
+_backend_version: &backend_version "0.12.0"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.4.1"
+_admin_frontend_version: &admin_frontend_version "0.4.2"
 # -- Portal Frontend version is used for the portal-frontend image tag
-_portal-frontend_version: &portal-frontend_version "0.6.1"
+_portal-frontend_version: &portal-frontend_version "0.6.2"
 # -- SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both)
-_sdmx_proxy_version: &sdmx_proxy_version "0.3.1"
+_sdmx_proxy_version: &sdmx_proxy_version "0.4.0"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
@@ -449,7 +449,9 @@ admin-frontend:
     # -- API URL for admin-backend
     API_URL: "environment-specific"
     # -- URL for NextAuth service
-    NEXTAUTH_URL: "environment-specific"
+    AUTH_URL: "environment-specific"
+    # -- Trust the host header from a reverse proxy or ingress (set to "false" for local/direct access)
+    AUTH_TRUST_HOST: "true"
 
     ### Keycloak Identity Provider ###
     # -- Client ID for Keycloak
@@ -479,7 +481,7 @@ admin-frontend:
     # -- DIAL API key for authentication
     # DIAL_API_KEY: ""
     # -- Secret for NextAuth session encryption (can be generated with: openssl rand -base64 64)
-    # NEXTAUTH_SECRET: ""
+    # AUTH_SECRET: ""
     #
     ### Keycloak Identity Provider ###
     # -- Keycloak client secret
@@ -797,14 +799,14 @@ portal-frontend:
     DIAL_API_VERSION: "environment-specific"
     # -- Default model
     DEFAULT_MODEL: "environment-specific"
-    # -- SDMX API URL
-    # SDMX_API_URL: "environment-specific"
-    # -- SDMX Constraints API URL (optional)
-    # CONSTRAINS_SDMX_API_URL: "environment-specific"
-    # -- API URL for sdmx-proxy (optional). Requires sdmx-proxy to be enabled
-    # SDMX_PROXY_URL: "environment-specific"
     # -- URL for NextAuth service
-    NEXTAUTH_URL: "environment-specific"
+    AUTH_URL: "environment-specific"
+    # -- Trust the host header from a reverse proxy or ingress (set to "false" for local/direct access)
+    AUTH_TRUST_HOST: "true"
+    # -- Enable cross-dataset mode to allow viewing, filtering, and configuring grid views across multiple datasets
+    CROSS_DATASET_MODE: "false"
+    # -- Markdown message displayed in the informational banner below the footer (leave empty to hide)
+    INFO_BANNER_MESSAGE: "version: {{ .Values.image.tag }}"
 
     ### Keycloak Identity Provider ###
     # -- Client ID for Keycloak
@@ -824,7 +826,7 @@ portal-frontend:
     # -- SDMX authentication key (required if SDMX API requires authentication)
     # SDMX_AUTH_KEY: ""
     # -- Secret for NextAuth session encryption (can be generated with: openssl rand -base64 64)
-    # NEXTAUTH_SECRET: ""
+    # AUTH_SECRET: ""
     #
     ### Keycloak Identity Provider ###
     # -- Keycloak client secret
