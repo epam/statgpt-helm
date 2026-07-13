@@ -25,6 +25,21 @@ Paired components (backend×2, sdmx-proxy×2) must stay on the same version — 
 why the anchors exist. Always edit the anchor at the top of values.yaml, never the
 individual `image.tag` fields.
 
+## Arguments
+
+The skill accepts optional free-text arguments that pre-answer decisions normally
+made in Steps 1–2:
+
+- `1.14` or `1.13.1` — the target chart version (also implies minor vs patch).
+- `patch` / `minor` — force the bump type when the heuristic would guess wrong.
+- `<component>=<version>` (e.g. `admin-frontend=0.4.3 backend=0.12.0`) — pin a
+  component, including holding one back from its latest release.
+
+Arguments narrow choices; they do not skip work. Still run the full Step 1
+collection for **all** components and still show the Step 2 confirmation table —
+with the pins pre-applied and any other available bumps visible — so the user sees
+the whole picture before anything is edited.
+
 ## Step 1 — Collect versions
 
 1. Read the current anchors from the top of `charts/statgpt/values.yaml` and the
