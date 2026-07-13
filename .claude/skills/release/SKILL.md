@@ -127,6 +127,28 @@ as feature descriptions. Component notes sometimes deprecate *application/channe
 config* fields (not values-file vars) — those are not deployment changes; if
 relevant to operators, add them as a short blockquote note instead.
 
+## Refreshing an open release PR
+
+Components often release while the chart release PR is still open. In that case do
+not start a new release — refresh the existing PR:
+
+1. Find it: `gh pr list --state open --search "create release in:title"` (or the
+   open `feat/release-*` / `chore/patch-*` branch) and check out its branch.
+2. Re-run Step 1 for the newly released component(s) only; confirm the delta with
+   the user (Step 2). Re-check the minor-vs-patch calculus — a new component
+   version with features or deployment changes can upgrade a patch PR to a minor
+   one, which means retitling the PR and renaming nothing (keep the branch; PRs are
+   squash-merged under the PR title, so only the title must be correct).
+3. Apply the additional bumps exactly as in Step 3 (anchor, deployment-change
+   edits, helm-docs regeneration, render check) and push a follow-up commit — no
+   need to amend or force-push.
+4. Update the PR description's version table, and **edit** the existing
+   release-notes draft comment rather than posting a second one:
+   ```sh
+   gh api repos/epam/statgpt-helm/issues/comments/<comment-id> -X PATCH -f body='...'
+   ```
+   (find the comment id via `gh api repos/epam/statgpt-helm/issues/<pr>/comments`).
+
 ## Cautions
 
 - Confirm with the user before pushing the branch / opening the PR.
