@@ -1,0 +1,13 @@
+# Helm dependency artifacts (created by `helm dependency update`)
+Chart.lock
+/charts/*/charts/
+
+# IDEs
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
