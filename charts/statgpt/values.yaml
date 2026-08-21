@@ -1,5 +1,5 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.13.3"
+_backend_version: &backend_version "0.13.4"
 # -- Admin Frontend version is used for the admin-frontend image tag
 _admin_frontend_version: &admin_frontend_version "0.4.4"
 # -- Portal Frontend version is used for the portal-frontend image tag
