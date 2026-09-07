@@ -149,3 +149,42 @@ sdmx-proxy-config-server:
     CONFIG_SERVER_SOURCE_CONFIG_PATH: "CONFIG_SERVER_SOURCE_CONFIG_PATH"
   secrets:
     DIAL_STORAGE_API_KEY: *DIAL_API_KEY
+
+mcp-app-frontend:
+  enabled: true
+  fullnameOverride: "statgpt-mcp-app-frontend"
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "50m"
+      memory: "128Mi"
+  env:
+    VITE_BASE_URL: "http://statgpt-mcp-app-frontend:8080"
+
+generic-rag:
+  enabled: true
+  fullnameOverride: "statgpt-generic-rag"
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+    requests:
+      cpu: "100m"
+      memory: "0.5Gi"
+  env:
+    DIAL_URL: *DIAL_URL
+    DB_HOST: *PGVECTOR_HOST
+    DB_PORT: *PGVECTOR_PORT
+    # The CI pgvector creates the "vector" extension only in its single auth.database, so
+    # generic-rag has to share it here. Real deployments give generic-rag its own database.
+    DB_NAME: *PGVECTOR_DATABASE
+    ELASTICSEARCH_URL: *ELASTIC_CONNECTION_STRING
+    ELASTICSEARCH_INDEX_PREFIX: "statgpt-test-generic-rag"
+  secrets:
+    DIAL_API_KEY: *DIAL_API_KEY
+    DB_USERNAME: *PGVECTOR_USER
+    DB_PASSWORD: *PGVECTOR_PASSWORD
+    ELASTICSEARCH_USERNAME: *ELASTIC_AUTH_USER
+    ELASTICSEARCH_PASSWORD: *ELASTIC_AUTH_PASSWORD

@@ -20,6 +20,8 @@ CI/humans after that — this skill only produces the **draft** and attaches it 
 | `_admin_frontend_version` | `epam/statgpt-admin-frontend` | admin-frontend |
 | `_portal-frontend_version` | `epam/statgpt-global-trusted-data-commons` | portal-frontend |
 | `_sdmx_proxy_version` | `epam/statgpt-sdmx-proxy` | sdmx-proxy, sdmx-proxy-config-server |
+| `_mcp_app_frontend_version` | `epam/statgpt-mcp-app-frontend` | mcp-app-frontend |
+| `_generic_rag_version` | `epam/ai-dial-generic-rag-backend` | generic-rag |
 
 Paired components (backend×2, sdmx-proxy×2) must stay on the same version — that is
 why the anchors exist. Always edit the anchor at the top of values.yaml, never the
@@ -121,6 +123,8 @@ Umbrella chart for StatGPT solution
 * `statgpt-admin-frontend`: [<v>](https://github.com/epam/statgpt-admin-frontend/releases/tag/<v>)
 * `statgpt-global-trusted-data-commons`: [<v>](https://github.com/epam/statgpt-global-trusted-data-commons/releases/tag/<v>)
 * `sdmx-proxy`: [<v>](https://github.com/epam/statgpt-sdmx-proxy/releases/tag/<v>)
+* `statgpt-mcp-app-frontend`: [<v>](https://github.com/epam/statgpt-mcp-app-frontend/releases/tag/<v>)
+* `ai-dial-generic-rag-backend`: [<v>](https://github.com/epam/ai-dial-generic-rag-backend/releases/tag/<v>)
 
 ## What's Changed
 
@@ -135,7 +139,7 @@ intermediate versions. If none:>
 No deployment changes required for this release.
 ```
 
-List **all four** components in Core Components with the versions the chart now
+List **every** component in Core Components with the versions the chart now
 pins, including ones that didn't change. "Deployment Changes" is written for chart
 *operators* — phrase entries as actions against their environment values files, not
 as feature descriptions. Component notes sometimes deprecate *application/channel
