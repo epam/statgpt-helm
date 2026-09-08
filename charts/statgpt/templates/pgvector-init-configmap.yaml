@@ -1,0 +1,58 @@
+{{- if .Values.pgvector.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-pgvector-init
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  01_init_databases_and_extensions.sh: |
+    #!/bin/sh
+    set -e
+
+    export PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD
+
+    echo "=== Creating vector extension in primary database ($POSTGRES_DATABASE) ==="
+    psql -U postgres -d "$POSTGRES_DATABASE" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+    echo "Installed extensions in $POSTGRES_DATABASE:"
+    psql -U postgres -d "$POSTGRES_DATABASE" -c "\dx"
+
+    {{- /* Setup secondary database for generic-rag if enabled */}}
+    {{- if index .Values "generic-rag" "enabled" }}
+
+    # Determine target database for generic-rag
+    TARGET_DB="{{ index .Values "generic-rag" "env" "DB_NAME" }}"
+
+    # Fallback to default if not explicitly configured
+    if [ "$TARGET_DB" = "environment-specific" ] || [ -z "$TARGET_DB" ]; then
+        TARGET_DB="statgpt_generic_rag"
+    fi
+
+    echo "=== Initializing generic-rag database: $TARGET_DB ==="
+
+    # Skip creation if targeting the primary database
+    if [ "$TARGET_DB" != "$POSTGRES_DATABASE" ]; then
+        if ! psql -U postgres -lqt | cut -d \| -f 1 | grep -qw "$TARGET_DB"; then
+            echo "Creating database: $TARGET_DB"
+            psql -U postgres -c "CREATE DATABASE \"$TARGET_DB\";"
+
+            # Set database ownership
+            psql -U postgres -c "ALTER DATABASE \"$TARGET_DB\" OWNER TO \"$POSTGRES_USER\";"
+        else
+            echo "Database $TARGET_DB already exists. Skipping creation."
+        fi
+
+        echo "Creating vector extension in $TARGET_DB..."
+        psql -U postgres -d "$TARGET_DB" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+        echo "Installed extensions in $TARGET_DB:"
+        psql -U postgres -d "$TARGET_DB" -c "\dx"
+    else
+        echo "Target matches primary database ($POSTGRES_DATABASE). Skipping separate creation."
+    fi
+    {{- end }}
+
+    echo "=== Initialization completed ==="
+{{- end }}
