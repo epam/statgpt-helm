@@ -9,7 +9,7 @@ _sdmx_proxy_version: &sdmx_proxy_version "0.5.0"
 # -- MCP App Frontend version is used for the mcp-app-frontend image tag
 _mcp_app_frontend_version: &mcp_app_frontend_version "0.1.0"
 # -- Generic RAG version is used for the generic-rag image tag
-_generic_rag_version: &generic_rag_version "0.1.4"
+_generic_rag_version: &generic_rag_version "0.2.0"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
