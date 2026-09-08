@@ -185,9 +185,7 @@ generic-rag:
     DIAL_URL: *DIAL_URL
     DB_HOST: *PGVECTOR_HOST
     DB_PORT: *PGVECTOR_PORT
-    # The CI pgvector creates the "vector" extension only in its single auth.database, so
-    # generic-rag has to share it here. Real deployments give generic-rag its own database
-    DB_NAME: *PGVECTOR_DATABASE
+    DB_NAME: "statgpt_generic_rag"
     ELASTICSEARCH_URL: *ELASTIC_CONNECTION_STRING
     ELASTICSEARCH_INDEX_PREFIX: "statgpt-test-generic-rag"
   secrets:

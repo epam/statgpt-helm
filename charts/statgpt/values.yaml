@@ -657,22 +657,10 @@ pgvector:
         mountPath: /opt/bitnami/postgresql/share
         subPath: postgresql-files/share
 
-    # -- Database initialization scripts to create the vector extension after PostgreSQL startup
+    # -- Database initialization scripts for creating vector extensions and additional databases
     initdb:
-      scripts:
-        01_create_extension.sh: |
-          #!/bin/sh
-          set -e
-
-          export PGPASSWORD=$POSTGRES_POSTGRES_PASSWORD
-
-          echo "=== Creating the vector extension in the database ==="
-          psql -U postgres -d $POSTGRES_DATABASE -c "CREATE EXTENSION IF NOT EXISTS vector;"
-
-          echo "Currently installed extensions:"
-          psql -U postgres -d $POSTGRES_DATABASE -c "\dx"
-
-          echo "=== The vector extension has been successfully created in the database ==="
+      # -- Mounts the templated ConfigMap generated from templates/pgvector-init-configmap.yaml
+      scriptsConfigMap: '{{ .Release.Name }}-pgvector-init'
 
 elasticsearch:
   # -- Indicates whether the elasticsearch service is enabled
