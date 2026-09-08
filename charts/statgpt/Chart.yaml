@@ -49,6 +49,16 @@ dependencies:
     repository: https://charts.dialx.ai
     alias: sdmx-proxy-config-server
     condition: sdmx-proxy-config-server.enabled
+  - name: dial-extension
+    version: 3.1.1
+    repository: https://charts.dialx.ai
+    alias: mcp-app-frontend
+    condition: mcp-app-frontend.enabled
+  - name: dial-extension
+    version: 3.1.1
+    repository: https://charts.dialx.ai
+    alias: generic-rag
+    condition: generic-rag.enabled
 description: Umbrella chart for StatGPT solution
 home: https://statgpt.dialx.ai
 icon: "https://statgpt.dialx.ai/icon.svg"
@@ -64,4 +74,4 @@ maintainers:
 name: statgpt
 sources:
   - https://github.com/epam/statgpt-helm
-version: 1.13.6
+version: 1.14.0

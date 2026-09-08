@@ -1,11 +1,15 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.13.5"
+_backend_version: &backend_version "0.14.1"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.4.4"
+_admin_frontend_version: &admin_frontend_version "0.5.0"
 # -- Portal Frontend version is used for the portal-frontend image tag
 _portal-frontend_version: &portal-frontend_version "0.6.3"
 # -- SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both)
 _sdmx_proxy_version: &sdmx_proxy_version "0.5.0"
+# -- MCP App Frontend version is used for the mcp-app-frontend image tag
+_mcp_app_frontend_version: &mcp_app_frontend_version "0.1.0"
+# -- Generic RAG version is used for the generic-rag image tag
+_generic_rag_version: &generic_rag_version "0.1.4"
 # -- PostgreSQL version is used for the postgresql image tag
 _postgresql_version: &postgresql_version "16.3.0-debian-12-r14"
 # -- PGVector extension version
@@ -119,6 +123,15 @@ chat-backend:
     ELASTIC_INDICATORS_INDEX: "environment-specific"
     # -- Index for Elasticsearch matching
     ELASTIC_MATCHING_INDEX: "environment-specific"
+
+    ### MCP Apps ###
+    # Configure these variables if mcp-app-frontend is enabled
+    # Uncomment and configure in your environment-specific values:
+    #
+    # -- Public origin for MCP widget assets (must match VITE_BASE_URL)
+    # MCP_APP_ORIGIN: "environment-specific"
+    # -- Internal base URL for fetching widget HTML (Kubernetes service URL)
+    # MCP_APP_HTML_HOST: "environment-specific"
 
     ### Data Related Variables ###
     # Configure these variables based on the data uploaded to the application
@@ -330,6 +343,15 @@ admin-backend:
     ELASTIC_INDICATORS_INDEX: "environment-specific"
     # -- Index for Elasticsearch matching
     ELASTIC_MATCHING_INDEX: "environment-specific"
+
+    ### MCP Apps ###
+    # Configure these variables if mcp-app-frontend is enabled
+    # Uncomment and configure in your environment-specific values:
+    #
+    # -- Public origin for MCP widget assets (must match VITE_BASE_URL)
+    # MCP_APP_ORIGIN: "environment-specific"
+    # -- Internal base URL for fetching widget HTML (Kubernetes service URL)
+    # MCP_APP_HTML_HOST: "environment-specific"
 
     ### Data Related Variables ###
     # Configure these variables based on the data uploaded to the application
@@ -1045,3 +1067,222 @@ sdmx-proxy-config-server:
     #
     # -- DIAL API key for DIAL Storage (if CONFIG_SERVER_SOURCE_TYPE is "DIAL_STORAGE")
     # DIAL_STORAGE_API_KEY: ""
+
+mcp-app-frontend:
+  # -- Indicates whether the mcp-app-frontend service is enabled
+  enabled: false
+
+  commonLabels:
+    # -- Kubernetes label to identify the component as an application
+    app.kubernetes.io/component: "application"
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: epam/statgpt-mcp-app-frontend
+    # -- Image tag or version
+    tag: *mcp_app_frontend_version
+    # -- Image pull policy
+    pullPolicy: Always
+
+  ### Container Port Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  containerPorts:
+    # -- HTTP port for the application
+    http: 8080
+
+  ### Liveness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable livenessProbe
+    enabled: true
+    # -- HTTP GET request configuration for liveness probe
+    httpGet:
+      # -- Health check endpoint path (a static SPA, so there is no /health route)
+      path: /
+
+  ### Readiness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  readinessProbe:
+    # -- Enable readinessProbe
+    enabled: true
+    # -- HTTP GET request configuration for readiness probe
+    httpGet:
+      # -- Health check endpoint path (a static SPA, so there is no /health route)
+      path: /
+
+  ### Resource Management ###
+  # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    limits:
+      # -- Maximum CPU limit for the container
+      cpu: "500m"
+      # -- Maximum memory limit for the container
+      memory: "512Mi"
+    requests:
+      # -- Minimum CPU request for resource scheduling
+      cpu: "50m"
+      # -- Minimum memory request for resource scheduling
+      memory: "128Mi"
+
+  metrics:
+    # -- Enable metrics collection
+    enabled: false
+    serviceMonitor:
+      # -- Enable Prometheus ServiceMonitor for metrics
+      enabled: false
+
+  ### Environment Variables ###
+  env:
+    # -- Public origin for widget assets (must match MCP_APP_ORIGIN)
+    VITE_BASE_URL: "environment-specific"
+
+  ### Secrets Configuration ###
+  # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
+  # The secrets are automatically created and mounted by the dial-extension chart
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  secrets: {}
+
+  ### Ingress Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    # -- Enable Ingress resource
+    enabled: false
+    # -- Specify the Ingress class name
+    ingressClassName: "nginx"
+    # -- Path for the Ingress resource
+    path: "/"
+    # -- NGINX annotations for proxy configuration
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+generic-rag:
+  # -- Indicates whether the generic-rag service is enabled
+  enabled: false
+
+  commonLabels:
+    # -- Kubernetes label to identify the component as an application
+    app.kubernetes.io/component: "application"
+
+  ### Container Image Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Docker registry URL
+    registry: docker.io
+    # -- Image repository name
+    repository: epam/ai-dial-generic-rag-backend
+    # -- Image tag or version
+    tag: *generic_rag_version
+    # -- Image pull policy
+    pullPolicy: Always
+
+  ### Container Port Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  containerPorts:
+    # -- HTTP port for the application
+    http: 5000
+
+  ### Liveness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable livenessProbe
+    enabled: true
+    # -- HTTP GET request configuration for liveness probe
+    httpGet:
+      # -- Health check endpoint path
+      path: /health
+
+  ### Readiness Probes configuration ###
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  readinessProbe:
+    # -- Enable readinessProbe
+    enabled: true
+    # -- HTTP GET request configuration for readiness probe
+    httpGet:
+      # -- Health check endpoint path
+      path: /health
+
+  ### Resource Management ###
+  # ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    limits:
+      # -- Maximum CPU limit for the container
+      cpu: "2000m"
+      # -- Maximum memory limit for the container
+      memory: "4Gi"
+    requests:
+      # -- Minimum CPU request for resource scheduling
+      cpu: "500m"
+      # -- Minimum memory request for resource scheduling
+      memory: "1Gi"
+
+  metrics:
+    # -- Enable metrics collection
+    enabled: false
+    serviceMonitor:
+      # -- Enable Prometheus ServiceMonitor for metrics
+      enabled: false
+
+  ### Environment Variables ###
+  env:
+    # -- Report debug stages in the DIAL conversation
+    ENABLE_DEBUG_STAGES: "false"
+    # -- Enable the in-memory file cache
+    IN_MEMORY_CACHE_ENABLED: "true"
+    # -- Capacity of the in-memory file cache (e.g. "128MiB", "1GiB")
+    IN_MEMORY_CACHE_CAPACITY: "128MiB"
+
+    # -- URL for DIAL application
+    DIAL_URL: "environment-specific"
+    # -- URL where DIAL Core is publicly reachable (used to generate interactive documentation)
+    # DIAL_PUBLIC_URL: "environment-specific"
+    # -- Host of the PostgreSQL database (requires the pgvector extension)
+    DB_HOST: "environment-specific"
+    # -- Port of the PostgreSQL database
+    DB_PORT: "5432"
+    # -- Name of the PostgreSQL database (must not share schema with backend PGVECTOR_DATABASE)
+    DB_NAME: "environment-specific"
+    # -- Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of DB_PASSWORD)
+    DB_MSI_ENABLED: "false"
+    # -- URL of the Elasticsearch instance (optional; when unset, every ELASTICSEARCH_* value is ignored)
+    # ELASTICSEARCH_URL: "environment-specific"
+    # -- Prefix added to every index generic-rag creates in Elasticsearch
+    # ELASTICSEARCH_INDEX_PREFIX: "environment-specific"
+
+  ### Secrets Configuration ###
+  # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
+  # The secrets are automatically created and mounted by the dial-extension chart
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  secrets: {}
+    # Uncomment and configure the following secrets in your environment-specific values:
+    #
+    # -- DIAL API key, enabling background job execution (e.g. indexing) on its behalf
+    # DIAL_API_KEY: ""
+    # -- PostgreSQL database username (required)
+    # DB_USERNAME: ""
+    # -- PostgreSQL database password. Ignored when DB_MSI_ENABLED is "true"
+    # DB_PASSWORD: ""
+    # -- Elasticsearch authentication username
+    # ELASTICSEARCH_USERNAME: ""
+    # -- Elasticsearch authentication password
+    # ELASTICSEARCH_PASSWORD: ""
+
+  ### Ingress Configuration ###
+  # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    # -- Enable Ingress resource
+    enabled: false
+    # -- Specify the Ingress class name
+    ingressClassName: "nginx"
+    # -- Path for the Ingress resource
+    path: "/"
+    # -- NGINX annotations for proxy configuration
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"

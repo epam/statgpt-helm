@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.13.6](https://img.shields.io/badge/Version-1.13.6-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.14.0](https://img.shields.io/badge/Version-1.14.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -25,6 +25,8 @@ Kubernetes: `>=1.23.0-0`
 | https://charts.dialx.ai | portal-frontend(dial-extension) | 3.1.1 |
 | https://charts.dialx.ai | sdmx-proxy(dial-extension) | 3.1.1 |
 | https://charts.dialx.ai | sdmx-proxy-config-server(dial-extension) | 3.1.1 |
+| https://charts.dialx.ai | mcp-app-frontend(dial-extension) | 3.1.1 |
+| https://charts.dialx.ai | generic-rag(dial-extension) | 3.1.1 |
 
 ## Validating the Chart
 
@@ -96,9 +98,11 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| _admin_frontend_version | string | `"0.4.4"` | Admin Frontend version is used for the admin-frontend image tag |
-| _backend_version | string | `"0.13.5"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
+| _admin_frontend_version | string | `"0.5.0"` | Admin Frontend version is used for the admin-frontend image tag |
+| _backend_version | string | `"0.14.1"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
+| _generic_rag_version | string | `"0.1.4"` | Generic RAG version is used for the generic-rag image tag |
+| _mcp_app_frontend_version | string | `"0.1.0"` | MCP App Frontend version is used for the mcp-app-frontend image tag |
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
 | _portal-frontend_version | string | `"0.6.3"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
@@ -143,7 +147,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-backend.image.repository | string | `"epam/statgpt-admin-backend"` | Image repository name |
-| admin-backend.image.tag | string | `"0.13.5"` | Image tag or version |
+| admin-backend.image.tag | string | `"0.14.1"` | Image tag or version |
 | admin-backend.ingress | object | `{"annotations":{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"},"enabled":false,"ingressClassName":"nginx","path":"/admin/api"}` | Example for data related variables DATA_PORTAL_API_KEY: "example" ## Ingress Configuration ### ref: https://kubernetes.io/docs/concepts/services-networking/ingress/ |
 | admin-backend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-backend.ingress.enabled | bool | `false` | Enable Ingress resource |
@@ -195,7 +199,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-frontend.image.repository | string | `"epam/statgpt-admin-frontend"` | Image repository name |
-| admin-frontend.image.tag | string | `"0.4.4"` | Image tag or version |
+| admin-frontend.image.tag | string | `"0.5.0"` | Image tag or version |
 | admin-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | admin-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -236,7 +240,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | chat-backend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | chat-backend.image.registry | string | `"docker.io"` | Docker registry URL |
 | chat-backend.image.repository | string | `"epam/statgpt-chat-backend"` | Image repository name |
-| chat-backend.image.tag | string | `"0.13.5"` | Image tag or version |
+| chat-backend.image.tag | string | `"0.14.1"` | Image tag or version |
 | chat-backend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | chat-backend.livenessProbe.initialDelaySeconds | int | `180` | Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during PostgreSQL initialization) |
 | chat-backend.metrics.enabled | bool | `false` | Enable metrics collection |
@@ -268,6 +272,63 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | elasticsearch.security.tls | object | `{"autoGenerated":true}` | Auto-generate TLS certificates |
 | elasticsearch.sysctlImage.repository | string | `"bitnamilegacy/os-shell"` | Fix: override deprecated repository with the updated one |
 | elasticsearch.volumePermissions.image.repository | string | `"bitnamilegacy/os-shell"` | Fix: override deprecated repository with the updated one |
+| generic-rag.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
+| generic-rag.containerPorts.http | int | `5000` | HTTP port for the application |
+| generic-rag.enabled | bool | `false` | Indicates whether the generic-rag service is enabled |
+| generic-rag.env.DB_HOST | string | `"environment-specific"` | Host of the PostgreSQL database (requires the pgvector extension) |
+| generic-rag.env.DB_MSI_ENABLED | string | `"false"` | Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of DB_PASSWORD) |
+| generic-rag.env.DB_NAME | string | `"environment-specific"` | Name of the PostgreSQL database (must not share schema with backend PGVECTOR_DATABASE) |
+| generic-rag.env.DB_PORT | string | `"5432"` | Port of the PostgreSQL database |
+| generic-rag.env.DIAL_URL | string | `"environment-specific"` | URL for DIAL application |
+| generic-rag.env.ENABLE_DEBUG_STAGES | string | `"false"` | Report debug stages in the DIAL conversation |
+| generic-rag.env.IN_MEMORY_CACHE_CAPACITY | string | `"128MiB"` | Capacity of the in-memory file cache (e.g. "128MiB", "1GiB") |
+| generic-rag.env.IN_MEMORY_CACHE_ENABLED | string | `"true"` | Enable the in-memory file cache |
+| generic-rag.image.pullPolicy | string | `"Always"` | Image pull policy |
+| generic-rag.image.registry | string | `"docker.io"` | Docker registry URL |
+| generic-rag.image.repository | string | `"epam/ai-dial-generic-rag-backend"` | Image repository name |
+| generic-rag.image.tag | string | `"0.1.4"` | Image tag or version |
+| generic-rag.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
+| generic-rag.ingress.enabled | bool | `false` | Enable Ingress resource |
+| generic-rag.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
+| generic-rag.ingress.path | string | `"/"` | Path for the Ingress resource |
+| generic-rag.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| generic-rag.livenessProbe.httpGet | object | `{"path":"/health"}` | HTTP GET request configuration for liveness probe |
+| generic-rag.livenessProbe.httpGet.path | string | `"/health"` | Health check endpoint path |
+| generic-rag.metrics.enabled | bool | `false` | Enable metrics collection |
+| generic-rag.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
+| generic-rag.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
+| generic-rag.readinessProbe.httpGet | object | `{"path":"/health"}` | HTTP GET request configuration for readiness probe |
+| generic-rag.readinessProbe.httpGet.path | string | `"/health"` | Health check endpoint path |
+| generic-rag.resources.limits.cpu | string | `"2000m"` | Maximum CPU limit for the container |
+| generic-rag.resources.limits.memory | string | `"4Gi"` | Maximum memory limit for the container |
+| generic-rag.resources.requests.cpu | string | `"500m"` | Minimum CPU request for resource scheduling |
+| generic-rag.resources.requests.memory | string | `"1Gi"` | Minimum memory request for resource scheduling |
+| generic-rag.secrets | object | `{}` |  |
+| mcp-app-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
+| mcp-app-frontend.containerPorts.http | int | `8080` | HTTP port for the application |
+| mcp-app-frontend.enabled | bool | `false` | Indicates whether the mcp-app-frontend service is enabled |
+| mcp-app-frontend.env.VITE_BASE_URL | string | `"environment-specific"` | Public origin for widget assets (must match MCP_APP_ORIGIN) |
+| mcp-app-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
+| mcp-app-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
+| mcp-app-frontend.image.repository | string | `"epam/statgpt-mcp-app-frontend"` | Image repository name |
+| mcp-app-frontend.image.tag | string | `"0.1.0"` | Image tag or version |
+| mcp-app-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
+| mcp-app-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
+| mcp-app-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
+| mcp-app-frontend.ingress.path | string | `"/"` | Path for the Ingress resource |
+| mcp-app-frontend.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
+| mcp-app-frontend.livenessProbe.httpGet | object | `{"path":"/"}` | HTTP GET request configuration for liveness probe |
+| mcp-app-frontend.livenessProbe.httpGet.path | string | `"/"` | Health check endpoint path (a static SPA, so there is no /health route) |
+| mcp-app-frontend.metrics.enabled | bool | `false` | Enable metrics collection |
+| mcp-app-frontend.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
+| mcp-app-frontend.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
+| mcp-app-frontend.readinessProbe.httpGet | object | `{"path":"/"}` | HTTP GET request configuration for readiness probe |
+| mcp-app-frontend.readinessProbe.httpGet.path | string | `"/"` | Health check endpoint path (a static SPA, so there is no /health route) |
+| mcp-app-frontend.resources.limits.cpu | string | `"500m"` | Maximum CPU limit for the container |
+| mcp-app-frontend.resources.limits.memory | string | `"512Mi"` | Maximum memory limit for the container |
+| mcp-app-frontend.resources.requests.cpu | string | `"50m"` | Minimum CPU request for resource scheduling |
+| mcp-app-frontend.resources.requests.memory | string | `"128Mi"` | Minimum memory request for resource scheduling |
+| mcp-app-frontend.secrets | object | `{}` |  |
 | pgvector.auth.database | string | `"statgpt"` | Database name |
 | pgvector.auth.username | string | `"statgpt"` | Custom database username |
 | pgvector.enabled | bool | `false` | Indicates whether the pgvector service is enabled |
