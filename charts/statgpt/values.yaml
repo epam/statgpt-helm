@@ -659,7 +659,7 @@ pgvector:
 
     # -- Database initialization scripts for creating vector extensions and additional databases
     initdb:
-      # Mounts the templated ConfigMap generated from templates/pgvector-init-configmap.yaml
+      # -- Mounts the templated ConfigMap generated from templates/pgvector-init-configmap.yaml
       scriptsConfigMap: '{{ .Release.Name }}-pgvector-init'
 
 elasticsearch:
