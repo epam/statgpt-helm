@@ -125,17 +125,12 @@ chat-backend:
     ELASTIC_MATCHING_INDEX: "environment-specific"
 
     ### MCP Apps ###
-    # Only needed when a channel exposes an MCP App widget (an `mcpResources` entry of type
-    # "proxied"). The channel config refers to these variables by name with the `$env:{VAR}`
-    # syntax, so both chat-backend and admin-backend must define them. Requires
-    # mcp-app-frontend to be enabled.
+    # Configure these variables if mcp-app-frontend is enabled
     # Uncomment and configure in your environment-specific values:
     #
-    # -- Public origin the MCP host loads the widget assets from; must be a bare origin
-    #    (scheme + host[:port], no path) and match mcp-app-frontend's VITE_BASE_URL
+    # -- Public origin for MCP widget assets (must match VITE_BASE_URL)
     # MCP_APP_ORIGIN: "environment-specific"
-    # -- Internal base URL the backend fetches the widget HTML from (server-to-server,
-    #    Kubernetes service URL of mcp-app-frontend)
+    # -- Internal base URL for fetching widget HTML (Kubernetes service URL)
     # MCP_APP_HTML_HOST: "environment-specific"
 
     ### Data Related Variables ###
@@ -350,17 +345,12 @@ admin-backend:
     ELASTIC_MATCHING_INDEX: "environment-specific"
 
     ### MCP Apps ###
-    # Only needed when a channel exposes an MCP App widget (an `mcpResources` entry of type
-    # "proxied"). The channel config refers to these variables by name with the `$env:{VAR}`
-    # syntax, so both chat-backend and admin-backend must define them. Requires
-    # mcp-app-frontend to be enabled.
+    # Configure these variables if mcp-app-frontend is enabled
     # Uncomment and configure in your environment-specific values:
     #
-    # -- Public origin the MCP host loads the widget assets from; must be a bare origin
-    #    (scheme + host[:port], no path) and match mcp-app-frontend's VITE_BASE_URL
+    # -- Public origin for MCP widget assets (must match VITE_BASE_URL)
     # MCP_APP_ORIGIN: "environment-specific"
-    # -- Internal base URL the backend fetches the widget HTML from (server-to-server,
-    #    Kubernetes service URL of mcp-app-frontend)
+    # -- Internal base URL for fetching widget HTML (Kubernetes service URL)
     # MCP_APP_HTML_HOST: "environment-specific"
 
     ### Data Related Variables ###
@@ -1101,7 +1091,7 @@ mcp-app-frontend:
   ### Container Port Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/service/
   containerPorts:
-    # -- HTTP port for the application (nginx-unprivileged binds 8080 as a non-root user)
+    # -- HTTP port for the application
     http: 8080
 
   ### Liveness Probes configuration ###
@@ -1147,21 +1137,17 @@ mcp-app-frontend:
 
   ### Environment Variables ###
   env:
-    # -- Public origin the widget assets are served from, without a trailing slash. Read at
-    # container start and stamped into the built assets so that asset URLs are absolute. Must
-    # equal the public origin of this service's ingress and the MCP_APP_ORIGIN value of
-    # chat-backend and admin-backend; otherwise the host iframe resolves asset URLs against
-    # its own sandbox origin and they 404.
+    # -- Public origin for widget assets (must match MCP_APP_ORIGIN)
     VITE_BASE_URL: "environment-specific"
 
   ### Secrets Configuration ###
-  # The widget is a static frontend and needs no secrets.
+  # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
+  # The secrets are automatically created and mounted by the dial-extension chart
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
   secrets: {}
 
   ### Ingress Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
-  # The MCP host loads the widget assets cross-origin, so this service has to be publicly
-  # reachable at VITE_BASE_URL. The image already sends "Access-Control-Allow-Origin: *".
   ingress:
     # -- Enable Ingress resource
     enabled: false
@@ -1244,6 +1230,13 @@ generic-rag:
 
   ### Environment Variables ###
   env:
+    # -- Report debug stages in the DIAL conversation
+    ENABLE_DEBUG_STAGES: "false"
+    # -- Enable the in-memory file cache
+    IN_MEMORY_CACHE_ENABLED: "true"
+    # -- Capacity of the in-memory file cache (e.g. "128MiB", "1GiB")
+    IN_MEMORY_CACHE_CAPACITY: "128MiB"
+
     # -- URL for DIAL application
     DIAL_URL: "environment-specific"
     # -- URL where DIAL Core is publicly reachable (used to generate interactive documentation)
@@ -1252,22 +1245,14 @@ generic-rag:
     DB_HOST: "environment-specific"
     # -- Port of the PostgreSQL database
     DB_PORT: "5432"
-    # -- Name of the PostgreSQL database. Must be a database of its own: generic-rag owns its
-    # schema and must not share one with the chat-backend/admin-backend PGVECTOR_DATABASE.
+    # -- Name of the PostgreSQL database (must not share schema with backend PGVECTOR_DATABASE)
     DB_NAME: "environment-specific"
     # -- Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of DB_PASSWORD)
     DB_MSI_ENABLED: "false"
     # -- URL of the Elasticsearch instance (optional; when unset, every ELASTICSEARCH_* value is ignored)
-    ELASTICSEARCH_URL: "environment-specific"
-    # -- Prefix added to every index generic-rag creates in Elasticsearch. Mandatory, and unique
-    # per deployment, when one Elasticsearch instance is shared by several generic-rag deployments.
-    ELASTICSEARCH_INDEX_PREFIX: "environment-specific"
-    # -- Report debug stages in the DIAL conversation
-    ENABLE_DEBUG_STAGES: "false"
-    # -- Enable the in-memory file cache
-    IN_MEMORY_CACHE_ENABLED: "true"
-    # -- Capacity of the in-memory file cache (e.g. "128MiB", "1GiB")
-    IN_MEMORY_CACHE_CAPACITY: "128MiB"
+    # ELASTICSEARCH_URL: "environment-specific"
+    # -- Prefix added to every index generic-rag creates in Elasticsearch
+    # ELASTICSEARCH_INDEX_PREFIX: "environment-specific"
 
   ### Secrets Configuration ###
   # Sensitive values are stored in Kubernetes Secrets and mounted as environment variables
@@ -1289,8 +1274,6 @@ generic-rag:
 
   ### Ingress Configuration ###
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
-  # DIAL Core reaches generic-rag in-cluster through the applicationTypeSchemas routes in its
-  # own configuration, so no public ingress is required.
   ingress:
     # -- Enable Ingress resource
     enabled: false

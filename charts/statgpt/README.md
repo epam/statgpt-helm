@@ -277,11 +277,9 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | generic-rag.enabled | bool | `false` | Indicates whether the generic-rag service is enabled |
 | generic-rag.env.DB_HOST | string | `"environment-specific"` | Host of the PostgreSQL database (requires the pgvector extension) |
 | generic-rag.env.DB_MSI_ENABLED | string | `"false"` | Use Azure Managed Identity for PostgreSQL (set to "true" to use MSI instead of DB_PASSWORD) |
-| generic-rag.env.DB_NAME | string | `"environment-specific"` | Name of the PostgreSQL database. Must be a database of its own: generic-rag owns its schema and must not share one with the chat-backend/admin-backend PGVECTOR_DATABASE. |
+| generic-rag.env.DB_NAME | string | `"environment-specific"` | Name of the PostgreSQL database (must not share schema with backend PGVECTOR_DATABASE) |
 | generic-rag.env.DB_PORT | string | `"5432"` | Port of the PostgreSQL database |
 | generic-rag.env.DIAL_URL | string | `"environment-specific"` | URL for DIAL application |
-| generic-rag.env.ELASTICSEARCH_INDEX_PREFIX | string | `"environment-specific"` | Prefix added to every index generic-rag creates in Elasticsearch. Mandatory, and unique per deployment, when one Elasticsearch instance is shared by several generic-rag deployments. |
-| generic-rag.env.ELASTICSEARCH_URL | string | `"environment-specific"` | URL of the Elasticsearch instance (optional; when unset, every ELASTICSEARCH_* value is ignored) |
 | generic-rag.env.ENABLE_DEBUG_STAGES | string | `"false"` | Report debug stages in the DIAL conversation |
 | generic-rag.env.IN_MEMORY_CACHE_CAPACITY | string | `"128MiB"` | Capacity of the in-memory file cache (e.g. "128MiB", "1GiB") |
 | generic-rag.env.IN_MEMORY_CACHE_ENABLED | string | `"true"` | Enable the in-memory file cache |
@@ -307,9 +305,9 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | generic-rag.resources.requests.memory | string | `"1Gi"` | Minimum memory request for resource scheduling |
 | generic-rag.secrets | object | `{}` |  |
 | mcp-app-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
-| mcp-app-frontend.containerPorts.http | int | `8080` | HTTP port for the application (nginx-unprivileged binds 8080 as a non-root user) |
+| mcp-app-frontend.containerPorts.http | int | `8080` | HTTP port for the application |
 | mcp-app-frontend.enabled | bool | `false` | Indicates whether the mcp-app-frontend service is enabled |
-| mcp-app-frontend.env.VITE_BASE_URL | string | `"environment-specific"` | Public origin the widget assets are served from, without a trailing slash. Read at container start and stamped into the built assets so that asset URLs are absolute. Must equal the public origin of this service's ingress and the MCP_APP_ORIGIN value of chat-backend and admin-backend; otherwise the host iframe resolves asset URLs against its own sandbox origin and they 404. |
+| mcp-app-frontend.env.VITE_BASE_URL | string | `"environment-specific"` | Public origin for widget assets (must match MCP_APP_ORIGIN) |
 | mcp-app-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | mcp-app-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | mcp-app-frontend.image.repository | string | `"epam/statgpt-mcp-app-frontend"` | Image repository name |

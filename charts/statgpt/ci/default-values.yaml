@@ -16,6 +16,8 @@ chat-backend:
     ELASTIC_CONNECTION_STRING: &ELASTIC_CONNECTION_STRING "http://statgpt-elasticsearch:9200"
     ELASTIC_INDICATORS_INDEX: &ELASTIC_INDICATORS_INDEX "statgpt-test-indicators"
     ELASTIC_MATCHING_INDEX: &ELASTIC_MATCHING_INDEX "statgpt-test-matching"
+    MCP_APP_ORIGIN: &MCP_APP_URL "http://statgpt-mcp-app-frontend"
+    MCP_APP_HTML_HOST: *MCP_APP_URL
   secrets:
     DIAL_API_KEY: &DIAL_API_KEY "DIAL_API_KEY"
     PGVECTOR_USER: &PGVECTOR_USER "statgpt"
@@ -43,6 +45,8 @@ admin-backend:
     ELASTIC_CONNECTION_STRING: *ELASTIC_CONNECTION_STRING
     ELASTIC_INDICATORS_INDEX: *ELASTIC_INDICATORS_INDEX
     ELASTIC_MATCHING_INDEX: *ELASTIC_MATCHING_INDEX
+    MCP_APP_ORIGIN: *MCP_APP_URL
+    MCP_APP_HTML_HOST: *MCP_APP_URL
   secrets:
     DIAL_API_KEY: *DIAL_API_KEY
     PGVECTOR_USER: *PGVECTOR_USER
@@ -63,10 +67,11 @@ admin-frontend:
   env:
     DIAL_API_URL: *DIAL_URL
     API_URL: "http://statgpt-admin-backend/admin"
-    NEXTAUTH_URL: "http://statgpt-admin-frontend"
+    AUTH_URL: "http://statgpt-admin-frontend"
+    AUTH_TRUST_HOST: "true"
   secrets:
     DIAL_API_KEY: *DIAL_API_KEY
-    NEXTAUTH_SECRET: "NEXTAUTH_SECRET"
+    AUTH_SECRET: "AUTH_SECRET"
 
 pgvector:
   enabled: true
@@ -117,10 +122,11 @@ portal-frontend:
     DIAL_API_URL: *DIAL_URL
     DIAL_API_VERSION: "2025-04-01-preview"
     DEFAULT_MODEL: "DEFAULT_MODEL"
-    NEXTAUTH_URL: "http://statgpt-portal-frontend"
+    AUTH_URL: "http://statgpt-portal-frontend"
+    AUTH_TRUST_HOST: "true"
     SDMX_API_URL: "SDMX_API_URL"
   secrets:
-    NEXTAUTH_SECRET: "NEXTAUTH_SECRET"
+    AUTH_SECRET: "AUTH_SECRET"
     SDMX_AUTH_KEY: "SDMX_AUTH_KEY"
 
 sdmx-proxy:
@@ -163,7 +169,7 @@ mcp-app-frontend:
       cpu: "50m"
       memory: "128Mi"
   env:
-    VITE_BASE_URL: "http://statgpt-mcp-app-frontend:8080"
+    VITE_BASE_URL: "http://statgpt-mcp-app-frontend"
 
 generic-rag:
   enabled: true
@@ -180,7 +186,7 @@ generic-rag:
     DB_HOST: *PGVECTOR_HOST
     DB_PORT: *PGVECTOR_PORT
     # The CI pgvector creates the "vector" extension only in its single auth.database, so
-    # generic-rag has to share it here. Real deployments give generic-rag its own database.
+    # generic-rag has to share it here. Real deployments give generic-rag its own database
     DB_NAME: *PGVECTOR_DATABASE
     ELASTICSEARCH_URL: *ELASTIC_CONNECTION_STRING
     ELASTICSEARCH_INDEX_PREFIX: "statgpt-test-generic-rag"
