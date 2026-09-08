@@ -100,6 +100,8 @@ elasticsearch:
   security:
     enabled: true
     elasticPassword: *ELASTIC_AUTH_PASSWORD
+    tls:
+      restEncryption: false
 
 portal-frontend:
   enabled: true
