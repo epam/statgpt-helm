@@ -1,9 +1,9 @@
 # -- Backend version is used for both chat-backend and admin-backend image tags (must be the same for both)
-_backend_version: &backend_version "0.14.1"
+_backend_version: &backend_version "0.16.2"
 # -- Admin Frontend version is used for the admin-frontend image tag
-_admin_frontend_version: &admin_frontend_version "0.5.1"
+_admin_frontend_version: &admin_frontend_version "0.5.3"
 # -- Portal Frontend version is used for the portal-frontend image tag
-_portal-frontend_version: &portal-frontend_version "0.6.3"
+_portal-frontend_version: &portal-frontend_version "0.6.4"
 # -- SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both)
 _sdmx_proxy_version: &sdmx_proxy_version "0.5.0"
 # -- MCP App Frontend version is used for the mcp-app-frontend image tag
@@ -474,6 +474,8 @@ admin-frontend:
     AUTH_URL: "environment-specific"
     # -- Trust the host header from a reverse proxy or ingress (set to "false" for local/direct access)
     AUTH_TRUST_HOST: "true"
+    # -- Enable Grade C (discovery) datasets
+    ENABLE_DISCOVERY_DATASETS: "false"
 
     ### Keycloak Identity Provider ###
     # -- Client ID for Keycloak
