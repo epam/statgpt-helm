@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.16.1](https://img.shields.io/badge/Version-1.16.1-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.16.2](https://img.shields.io/badge/Version-1.16.2-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -98,11 +98,11 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| _admin_frontend_version | string | `"0.5.3"` | Admin Frontend version is used for the admin-frontend image tag |
+| _admin_frontend_version | string | `"0.5.4"` | Admin Frontend version is used for the admin-frontend image tag |
 | _backend_version | string | `"0.17.5"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
-| _generic_rag_version | string | `"0.3.0"` | Generic RAG version is used for the generic-rag image tag |
-| _mcp_app_frontend_version | string | `"0.1.0"` | MCP App Frontend version is used for the mcp-app-frontend image tag |
+| _generic_rag_version | string | `"0.3.2"` | Generic RAG version is used for the generic-rag image tag |
+| _mcp_app_frontend_version | string | `"0.2.0"` | MCP App Frontend version is used for the mcp-app-frontend image tag |
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
 | _portal-frontend_version | string | `"0.6.4"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
@@ -200,7 +200,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-frontend.image.repository | string | `"epam/statgpt-admin-frontend"` | Image repository name |
-| admin-frontend.image.tag | string | `"0.5.3"` | Image tag or version |
+| admin-frontend.image.tag | string | `"0.5.4"` | Image tag or version |
 | admin-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | admin-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -287,7 +287,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | generic-rag.image.pullPolicy | string | `"Always"` | Image pull policy |
 | generic-rag.image.registry | string | `"docker.io"` | Docker registry URL |
 | generic-rag.image.repository | string | `"epam/ai-dial-generic-rag-backend"` | Image repository name |
-| generic-rag.image.tag | string | `"0.3.0"` | Image tag or version |
+| generic-rag.image.tag | string | `"0.3.2"` | Image tag or version |
 | generic-rag.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | generic-rag.ingress.enabled | bool | `false` | Enable Ingress resource |
 | generic-rag.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -295,6 +295,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | generic-rag.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | generic-rag.livenessProbe.httpGet | object | `{"path":"/health"}` | HTTP GET request configuration for liveness probe |
 | generic-rag.livenessProbe.httpGet.path | string | `"/health"` | Health check endpoint path |
+| generic-rag.livenessProbe.initialDelaySeconds | int | `180` | Initial delay in seconds before liveness probe starts (increased to prevent premature pod restarts during application startup) |
 | generic-rag.metrics.enabled | bool | `false` | Enable metrics collection |
 | generic-rag.metrics.serviceMonitor.enabled | bool | `false` | Enable Prometheus ServiceMonitor for metrics |
 | generic-rag.readinessProbe.enabled | bool | `true` | Enable readinessProbe |
@@ -312,7 +313,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | mcp-app-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | mcp-app-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | mcp-app-frontend.image.repository | string | `"epam/statgpt-mcp-app-frontend"` | Image repository name |
-| mcp-app-frontend.image.tag | string | `"0.1.0"` | Image tag or version |
+| mcp-app-frontend.image.tag | string | `"0.2.0"` | Image tag or version |
 | mcp-app-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | mcp-app-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | mcp-app-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
