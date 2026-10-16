@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.17.0](https://img.shields.io/badge/Version-1.17.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.17.1](https://img.shields.io/badge/Version-1.17.1-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -98,7 +98,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| _admin_frontend_version | string | `"0.5.4"` | Admin Frontend version is used for the admin-frontend image tag |
+| _admin_frontend_version | string | `"0.5.7"` | Admin Frontend version is used for the admin-frontend image tag |
 | _backend_version | string | `"0.17.6"` | Backend version is used for both chat-backend and admin-backend image tags (must be the same for both) |
 | _elasticsearch_version | string | `"8.14.3-debian-12-r0"` | Elasticsearch version is used for the elasticsearch image tag |
 | _generic_rag_version | string | `"0.3.2"` | Generic RAG version is used for the generic-rag image tag |
@@ -193,14 +193,14 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | admin-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
 | admin-frontend.enabled | bool | `false` | Indicates whether the admin-frontend service is enabled |
 | admin-frontend.env.API_URL | string | `"environment-specific"` | API URL for admin-backend |
-| admin-frontend.env.AUTH_TRUST_HOST | string | `"true"` | Trust the host header from a reverse proxy or ingress (set to "false" for local/direct access) |
-| admin-frontend.env.AUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
+| admin-frontend.env.AUTH_TRUST_HOST | string | `"true"` | Trust the Host and X-Forwarded-* headers from a reverse proxy or ingress. Auth.js treats any non-empty value, including "false", as enabled. To disable it, set it to null |
+| admin-frontend.env.AUTH_URL | string | `"environment-specific"` | Public URL of the admin frontend, used by Auth.js. Enables user authentication. To run without authentication, set it to null and set admin-backend.env.OIDC_AUTH_ENABLED to "false" |
 | admin-frontend.env.DIAL_API_URL | string | `"environment-specific"` | DIAL API URL |
 | admin-frontend.env.ENABLE_DISCOVERY_DATASETS | string | `"false"` | Enable Grade C (discovery) datasets |
 | admin-frontend.image.pullPolicy | string | `"Always"` | Image pull policy |
 | admin-frontend.image.registry | string | `"docker.io"` | Docker registry URL |
 | admin-frontend.image.repository | string | `"epam/statgpt-admin-frontend"` | Image repository name |
-| admin-frontend.image.tag | string | `"0.5.4"` | Image tag or version |
+| admin-frontend.image.tag | string | `"0.5.7"` | Image tag or version |
 | admin-frontend.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | admin-frontend.ingress.enabled | bool | `false` | Enable Ingress resource |
 | admin-frontend.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
@@ -353,7 +353,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | portal-frontend.commonLabels."app.kubernetes.io/component" | string | `"application"` | Kubernetes label to identify the component as an application |
 | portal-frontend.containerPorts.http | int | `3000` | HTTP port for the application |
 | portal-frontend.enabled | bool | `false` | Indicates whether the portal-frontend service is enabled |
-| portal-frontend.env.AUTH_TRUST_HOST | string | `"true"` | Trust the host header from a reverse proxy or ingress (set to "false" for local/direct access) |
+| portal-frontend.env.AUTH_TRUST_HOST | string | `"true"` | Trust the Host and X-Forwarded-* headers from a reverse proxy or ingress. Auth.js treats any non-empty value, including "false", as enabled. To disable it, set it to null |
 | portal-frontend.env.AUTH_URL | string | `"environment-specific"` | URL for NextAuth service |
 | portal-frontend.env.CROSS_DATASET_MODE | string | `"false"` | Enable cross-dataset mode to allow viewing, filtering, and configuring grid views across multiple datasets |
 | portal-frontend.env.DEFAULT_MODEL | string | `"environment-specific"` | Default model |
