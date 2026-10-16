@@ -1,6 +1,6 @@
 # statgpt
 
-![Version: 1.16.3](https://img.shields.io/badge/Version-1.16.3-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.17.0](https://img.shields.io/badge/Version-1.17.0-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Umbrella chart for StatGPT solution
 
@@ -106,7 +106,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | _pgvector_version | string | `"v0.8.1"` | PGVector extension version |
 | _portal-frontend_version | string | `"0.6.4"` | Portal Frontend version is used for the portal-frontend image tag |
 | _postgresql_version | string | `"16.3.0-debian-12-r14"` | PostgreSQL version is used for the postgresql image tag |
-| _sdmx_proxy_version | string | `"0.5.0"` | SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both) |
+| _sdmx_proxy_version | string | `"0.6.0"` | SDMX Proxy version is used for both sdmx-proxy and sdmx-proxy-config-server image tags (must be the same for both) |
 | admin-backend.autoUpdateCronJob.backoffLimit | int | `2` | Number of retries before considering a Job as failed |
 | admin-backend.autoUpdateCronJob.concurrencyPolicy | string | `"Forbid"` | ConcurrencyPolicy: Forbid, Allow, or Replace |
 | admin-backend.autoUpdateCronJob.enabled | bool | `false` | Enable CronJob that runs admin-backend in AUTO_UPDATE mode (batch auto-update for all eligible channels) |
@@ -391,7 +391,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | sdmx-proxy-config-server.image.pullPolicy | string | `"Always"` | Image pull policy |
 | sdmx-proxy-config-server.image.registry | string | `"docker.io"` | Docker registry URL |
 | sdmx-proxy-config-server.image.repository | string | `"epam/statgpt-sdmx-proxy-config-server"` | Image repository name |
-| sdmx-proxy-config-server.image.tag | string | `"0.5.0"` | Image tag or version |
+| sdmx-proxy-config-server.image.tag | string | `"0.6.0"` | Image tag or version |
 | sdmx-proxy-config-server.livenessProbe.enabled | bool | `true` | Enable livenessProbe |
 | sdmx-proxy-config-server.livenessProbe.httpGet | object | `{"path":"/health"}` | HTTP GET request configuration for liveness probe |
 | sdmx-proxy-config-server.livenessProbe.httpGet.path | string | `"/health"` | Health check endpoint path |
@@ -414,7 +414,7 @@ helm install my-release . --namespace my-namespace --values values.yaml --set ad
 | sdmx-proxy.image.pullPolicy | string | `"Always"` | Image pull policy |
 | sdmx-proxy.image.registry | string | `"docker.io"` | Docker registry URL |
 | sdmx-proxy.image.repository | string | `"epam/statgpt-sdmx-proxy"` | Image repository name |
-| sdmx-proxy.image.tag | string | `"0.5.0"` | Image tag or version |
+| sdmx-proxy.image.tag | string | `"0.6.0"` | Image tag or version |
 | sdmx-proxy.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"600","nginx.ingress.kubernetes.io/proxy-read-timeout":"600","nginx.ingress.kubernetes.io/proxy-send-timeout":"600"}` | NGINX annotations for proxy configuration |
 | sdmx-proxy.ingress.enabled | bool | `false` | Enable Ingress resource |
 | sdmx-proxy.ingress.ingressClassName | string | `"nginx"` | Specify the Ingress class name |
